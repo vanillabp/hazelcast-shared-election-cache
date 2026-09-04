@@ -10,7 +10,6 @@ import io.smallrye.config.SmallRyeConfig;
 import io.vanillabp.electioncache.hazelcast.ElectionCacheMember;
 import io.vanillabp.electioncache.hazelcast.ElectionCacheMessages;
 import io.vanillabp.integration.adapter.migration.processservice.InMemoryWorkflowAdapterCache;
-import io.vanillabp.integration.adapter.migration.processservice.WorkflowAdapterCacheStatistics;
 import io.vanillabp.integration.runtime.config.QuarkusMigrationAdapterProperties;
 import io.vanillabp.integration.runtime.config.QuarkusMigrationAdapterPropertiesMapper;
 import io.vanillabp.integration.spi.WorkflowAdapterCache;
@@ -48,8 +47,6 @@ public class HazelcastElectionCacheProducer {
   private ElectionCacheMember member;
 
   /**
-   * @param statistics The platform's cache statistics, read only where the in-memory
-   *          fallback is built
    * @param applicationsInstance The Hazelcast the application provides, if it provides
    *          one: a second member in the same JVM would be waste and a second cluster
    *          to reason about
@@ -58,7 +55,6 @@ public class HazelcastElectionCacheProducer {
   @Produces
   @Singleton
   public WorkflowAdapterCache hazelcastElectionCache(
-      final WorkflowAdapterCacheStatistics statistics,
       final Instance<HazelcastInstance> applicationsInstance) {
 
     final var properties = ConfigProvider
@@ -78,7 +74,7 @@ public class HazelcastElectionCacheProducer {
     if (!properties.isEnabled()) {
       // the same cache the platform would have produced: a producer cannot decline to
       // produce, so switching this off means building the default here
-      return new InMemoryWorkflowAdapterCache(lifetimes, statistics);
+      return new InMemoryWorkflowAdapterCache(lifetimes);
     }
 
     properties.validate();
@@ -105,7 +101,7 @@ public class HazelcastElectionCacheProducer {
       return member.cache();
     } catch (final RuntimeException e) {
       log.warn(ElectionCacheMessages.startFailed(properties), e);
-      return new InMemoryWorkflowAdapterCache(lifetimes, statistics);
+      return new InMemoryWorkflowAdapterCache(lifetimes);
     }
 
   }
