@@ -9,8 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import com.hazelcast.core.Hazelcast;
-
 import io.quarkus.test.QuarkusExtensionTest;
 import io.vanillabp.integration.adapter.migration.processservice.InMemoryWorkflowAdapterCache;
 import io.vanillabp.integration.spi.WorkflowAdapterCache;
@@ -22,8 +20,9 @@ import jakarta.inject.Inject;
  * of somebody else's. The dependency stays where it is and the hints go back into the
  * in-memory cache of the platform, which every node keeps for itself.
  * <p>
- * What this asserts is that no Hazelcast is started at all - a switch which only stops
- * the cache from being used would leave the member, its threads and its port behind.
+ * The bean the application gets is the platform's in-memory cache, which is also the
+ * proof that no member was started: starting one is what the producer does on its way to
+ * building the other bean.
  */
 @ExtendWith(SuppressOutputExtension.class)
 public class TheCacheSwitchedOffTest {
@@ -42,8 +41,11 @@ public class TheCacheSwitchedOffTest {
   @DisplayName("The hints go back into the in-memory cache, and no member is started")
   public void theInMemoryCacheTakesOver() {
 
+    // the producer of this extension is what starts a member, and it did not: the bean it
+    // produced is the platform's own cache. The JVM-wide list of Hazelcast instances is
+    // deliberately not asserted here - the applications of the other test classes of this
+    // module live in the same JVM, so that list says nothing about this one
     assertThat(cacheOfTheApplication).isInstanceOf(InMemoryWorkflowAdapterCache.class);
-    assertThat(Hazelcast.getAllHazelcastInstances()).isEmpty();
 
     cacheOfTheApplication.put("election-cache-test-module", "ride", "1", "pea");
     assertThat(cacheOfTheApplication.get("election-cache-test-module", "ride", "1")).contains("pea");

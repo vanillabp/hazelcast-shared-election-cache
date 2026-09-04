@@ -4,6 +4,8 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.DisposableBean;
 
+import com.hazelcast.core.HazelcastInstance;
+
 import io.vanillabp.electioncache.hazelcast.ElectionCacheMember;
 import io.vanillabp.integration.spi.WorkflowAdapterCache;
 
@@ -37,6 +39,20 @@ class ManagedElectionCache implements WorkflowAdapterCache, DisposableBean {
   String clusterName() {
 
     return member.clusterName();
+
+  }
+
+  /**
+   * The Hazelcast the hints live in: the member this bean started, or the instance the
+   * application provided. Read by the tests, which judge this instance rather than the
+   * JVM-wide list of instances - Spring keeps every test context until the JVM exits, so
+   * that list carries the members of whatever ran before.
+   *
+   * @return The instance
+   */
+  HazelcastInstance instance() {
+
+    return member.instance();
 
   }
 

@@ -68,18 +68,22 @@ public class HazelcastElectionCacheAutoConfigurationTest {
   @DisplayName("The dependency alone contributes the cache, and its lifetime is the context's")
   public void theDependencyContributesTheCache() {
 
+    final var instanceOfTheApplication = new java.util.concurrent.atomic.AtomicReference<HazelcastInstance>();
+
     theApplication
         .run(context -> {
           assertThat(context).hasSingleBean(WorkflowAdapterCache.class);
           assertThat(context.getBean(WorkflowAdapterCache.class))
               .isInstanceOf(ManagedElectionCache.class);
-          assertThat(context.getBean(ManagedElectionCache.class).clusterName())
-              .isEqualTo("spring-auto-configuration-test");
-          assertThat(Hazelcast.getAllHazelcastInstances()).hasSize(1);
+
+          final var cache = context.getBean(ManagedElectionCache.class);
+          assertThat(cache.clusterName()).isEqualTo("spring-auto-configuration-test");
+          assertThat(cache.instance().getLifecycleService().isRunning()).isTrue();
+          instanceOfTheApplication.set(cache.instance());
         });
 
     // the context which built the member took it down again
-    assertThat(Hazelcast.getAllHazelcastInstances()).isEmpty();
+    assertThat(instanceOfTheApplication.get().getLifecycleService().isRunning()).isFalse();
 
   }
 
@@ -147,7 +151,7 @@ public class HazelcastElectionCacheAutoConfigurationTest {
           assertThat(context).hasSingleBean(WorkflowAdapterCache.class);
           assertThat(context.getBean(WorkflowAdapterCache.class))
               .isInstanceOf(InMemoryWorkflowAdapterCache.class);
-          assertThat(Hazelcast.getAllHazelcastInstances()).isEmpty();
+          assertThat(context).doesNotHaveBean(ManagedElectionCache.class);
         });
 
   }
@@ -156,11 +160,15 @@ public class HazelcastElectionCacheAutoConfigurationTest {
   @DisplayName("An environment which should not form a cluster switches the cache off")
   public void theCacheCanBeSwitchedOff() {
 
+    final var membersRunningBefore = runningMembers();
+
     theApplication
         .withPropertyValues("vanillabp.workflow-adapter-cache.hazelcast.enabled=false")
         .run(context -> {
           assertThat(context).doesNotHaveBean(WorkflowAdapterCache.class);
-          assertThat(Hazelcast.getAllHazelcastInstances()).isEmpty();
+          assertThat(context).doesNotHaveBean(ManagedElectionCache.class);
+          // and no member was started: what would have started one is the bean above
+          assertThat(runningMembers()).isEqualTo(membersRunningBefore);
         });
 
   }
@@ -212,10 +220,10 @@ public class HazelcastElectionCacheAutoConfigurationTest {
     theApplication
         .withUserConfiguration(AnApplicationWithItsOwnHazelcast.class)
         .run(context -> {
-          assertThat(context.getBean(ManagedElectionCache.class).clusterName())
-              .isEqualTo("the-applications-own-cluster");
-          // one member, and it is the application's
-          assertThat(Hazelcast.getAllHazelcastInstances()).hasSize(1);
+          final var cache = context.getBean(ManagedElectionCache.class);
+          assertThat(cache.clusterName()).isEqualTo("the-applications-own-cluster");
+          // the application's instance itself, not a second member beside it
+          assertThat(cache.instance()).isSameAs(context.getBean(HazelcastInstance.class));
 
           context.getBean(WorkflowAdapterCache.class).put(MODULE, PROCESS, "1", "camunda8");
           assertThat(
@@ -243,6 +251,18 @@ public class HazelcastElectionCacheAutoConfigurationTest {
     properties.setPortAutoIncrement(true);
     properties.setAloneReminderInterval(Duration.ofHours(1));
     return properties;
+
+  }
+
+  /**
+   * How many Hazelcast members are running in this JVM. Only ever compared against a
+   * reading of its own: Spring keeps every test context until the JVM exits, so the
+   * members of whatever ran before are still in this list, and an absolute number would
+   * depend on the order the test classes happen to run in.
+   */
+  private static int runningMembers() {
+
+    return Hazelcast.getAllHazelcastInstances().size();
 
   }
 
