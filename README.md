@@ -291,11 +291,19 @@ probing walk per node.
 
 ## What the metrics show
 
-The platform counts the hits and the misses of whatever cache is in use, so those meters keep
-working with this one. What it cannot report for a cache it did not write is the size of the cache
-and its evictions: the numbers `vanillabp.workflow.adapter.cache.size` and
-`...evictions` are missing while a shared cache is in use. Hazelcast knows the size of the map
-across the cluster, and reporting it would need an addition to the platform's SPI.
+The platform counts what the election asks of whatever cache is in use, so
+`vanillabp.workflow.adapter.cache.hits`, `.misses` and `.ended.marks` keep working with this one.
+The numbers only the cache itself can know do not:
+
+- `.size` and `.size.ended` report `NaN`. Hazelcast knows the size of the map across the cluster,
+  and handing it over would need an addition to the platform's SPI, which is a story of its own.
+- `.evictions`, `.evictions.unused` and `.lost.hints` stay at zero, and here that is the truth
+  rather than a gap: nothing evicts. This cache has no size bound, entries leave when their
+  lifetime is over, and the eviction-pressure warning of the in-memory default therefore has
+  nothing to warn about. What replaces it as the number to watch is `.misses` against `.hits`.
+
+A cache which fills the heap of the cluster is the case this leaves unwatched, and until the size
+is reported, Hazelcast's own metrics are where an operator sees it.
 
 ## Building and testing
 
