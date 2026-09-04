@@ -16,6 +16,9 @@
     <!-- nothing to publish - this module only judges the reports -->
     <maven.install.skip>true</maven.install.skip>
     <maven.deploy.skip>true</maven.deploy.skip>
+    <!-- and nothing to publish to Maven Central either: the property is what the
+         release-parent's central-publishing plugin reads -->
+    <skip.central.release>true</skip.central.release>
     <!-- the gate contributes no coverage itself, so it needs no entry in any report;
          the empty agent keeps Surefire's inherited '@{jacoco.agent}' resolvable -->
     <jacoco.skip>true</jacoco.skip>

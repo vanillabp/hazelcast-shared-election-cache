@@ -305,6 +305,18 @@ The numbers only the cache itself can know do not:
 A cache which fills the heap of the cluster is the case this leaves unwatched, and until the size
 is reported, Hazelcast's own metrics are where an operator sees it.
 
+## Releasing
+
+`Release 🚀` is started by hand with the version to release. It publishes to Maven Central from a
+release branch, leaves a tag and a draft release, and opens the pull request which carries the
+version bump back into main.
+
+It refuses to run while a POM still names a SNAPSHOT, and while VanillaBP 2.0 is unreleased that is
+every run: this repository's own version is set by the workflow, so a SNAPSHOT left over is a
+dependency on something unreleased, which Maven Central rejects anyway. Two of them have to be
+released first, the platform and the Process-Engine-API adapter the tests of the platform modules
+boot against.
+
 ## Building and testing
 
 ```bash

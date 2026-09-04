@@ -13,6 +13,12 @@
   <name>VanillaBP shared election cache on Hazelcast - Test coverage report - Spring Boot</name>
   <description>Aggregated test coverage of the cache itself and of its Spring Boot auto-configuration.</description>
 
+  <properties>
+    <!-- a report is published on GitHub Pages and never to Maven Central: the property is
+         what the release-parent's central-publishing plugin reads -->
+    <skip.central.release>true</skip.central.release>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>io.vanillabp</groupId>

@@ -20,6 +20,12 @@
     <module>coverage-gate</module>
   </modules>
 
+  <properties>
+    <!-- a report is published on GitHub Pages and never to Maven Central: the property is
+         what the release-parent's central-publishing plugin reads -->
+    <skip.central.release>true</skip.central.release>
+  </properties>
+
   <build>
     <plugins>
       <plugin>
