@@ -14,6 +14,7 @@ import com.hazelcast.core.HazelcastInstance;
 
 import io.vanillabp.electioncache.hazelcast.ElectionCacheMember;
 import io.vanillabp.electioncache.hazelcast.ElectionCacheMessages;
+import io.vanillabp.electioncache.hazelcast.HazelcastElectionCacheProperties;
 import io.vanillabp.integration.adapter.migration.processservice.InMemoryWorkflowAdapterCache;
 import io.vanillabp.integration.adapter.migration.processservice.WorkflowAdapterCacheStatistics;
 import io.vanillabp.integration.config.VanillaBpConfigurationProperties;
@@ -37,9 +38,7 @@ import io.vanillabp.integration.spi.WorkflowAdapterCache;
  * changes where the hints live and nothing about how long they live.
  */
 @AutoConfiguration(before = SpringBootMigrationAdapterAutoConfiguration.class)
-@ConditionalOnProperty(
-    name = "vanillabp.workflow-adapter-cache.hazelcast.enabled",
-    matchIfMissing = true)
+@ConditionalOnProperty(name = HazelcastElectionCacheProperties.ENABLED_PROPERTY, matchIfMissing = true)
 @EnableConfigurationProperties({
     SpringHazelcastElectionCacheProperties.class, VanillaBpConfigurationProperties.class
 })
