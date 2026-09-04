@@ -1,0 +1,7 @@
+name: vanillabp-hazelcast-election-cache
+artifact: "${project.groupId}:${project.artifactId}:${project.version}"
+dependencies:
+  - vanillabp
+capabilities:
+  provides:
+    - io.vanillabp.election-cache.hazelcast

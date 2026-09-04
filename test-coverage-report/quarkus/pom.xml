@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>io.vanillabp</groupId>
+    <artifactId>hazelcast-shared-election-cache-test-coverage-report</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>hazelcast-shared-election-cache-quarkus-report</artifactId>
+  <packaging>pom</packaging>
+  <name>VanillaBP shared election cache on Hazelcast - Test coverage report - Quarkus</name>
+  <description>Aggregated test coverage of the cache itself and of its Quarkus extension.</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.vanillabp</groupId>
+      <artifactId>hazelcast-shared-election-cache</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.vanillabp</groupId>
+      <artifactId>hazelcast-shared-election-cache-quarkus</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- the tests booting a Quarkus application live in the deployment module, and their
+         execution data is where the Quarkus coverage of the cache itself comes from -->
+    <dependency>
+      <groupId>io.vanillabp</groupId>
+      <artifactId>hazelcast-shared-election-cache-quarkus-deployment</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <version>3.1.4</version>
+        <configuration>
+          <!-- nothing to deploy - report is published on Github pages -->
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${jacoco.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <!-- 'report-aggregate' sums up all '*.exec' files found in the modules listed in <dependencies> into one report -->
+              <goal>report-aggregate</goal>
+            </goals>
+            <phase>verify</phase>
+            <configuration>
+              <outputDirectory>${project.basedir}/report</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

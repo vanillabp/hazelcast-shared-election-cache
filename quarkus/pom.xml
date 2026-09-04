@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>io.vanillabp</groupId>
+    <artifactId>hazelcast-shared-election-cache-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>hazelcast-shared-election-cache-quarkus-parent</artifactId>
+  <packaging>pom</packaging>
+  <name>VanillaBP shared election cache on Hazelcast - Quarkus</name>
+
+  <modules>
+    <module>runtime</module>
+    <module>deployment</module>
+  </modules>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <!-- The tests here boot their application IN this JVM, and Quarkus logs that
+                 boot into a log context of its own: it happens in the Quarkus extension's
+                 beforeAll, after this extension's and before its first beforeEach, so
+                 nothing captures it. Hence the file - and the workflow uploads these
+                 reports when a build fails, so the full log of a red run is one download
+                 away instead of the last line Surefire prints. -->
+            <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            <systemPropertyVariables>
+              <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+              <!-- INFO and not ERROR: what a level drops reaches no handler, so it never
+                   reaches the capture either and a failing class replays nothing worth
+                   reading. -->
+              <quarkus.log.level>INFO</quarkus.log.level>
+              <maven.home>${maven.home}</maven.home>
+              <maven.repo>${settings.localRepository}</maven.repo>
+              <!--suppress UnresolvedMavenProperty - filled by goal jacoco-maven-plugin:prepare-agent in the root POM -->
+              <!-- handed to Quarkus prod-mode tests, which forward it into the JVM they
+                   fork - without it the forked run produces no coverage at all -->
+              <jacoco.agent>${jacoco.agent}</jacoco.agent>
+            </systemPropertyVariables>
+          </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <!-- necessary for serialization by Quarkus recorders -->
+            <parameters>true</parameters>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>

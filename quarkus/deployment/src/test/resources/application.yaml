@@ -1,0 +1,22 @@
+vanillabp:
+  prioritized-adapters:
+    - pea
+  adapters:
+    pea:
+      type: process-engine-api
+      name-clash-avoidance: none
+  workflow-modules:
+    election-cache-test-module:
+      adapters:
+        pea:
+          resources-location: classpath:election-cache-test-module/processes/none
+  workflow-adapter-cache:
+    ended-time-to-live: PT1S
+    hazelcast:
+      cluster-name: quarkus-application-test
+      discovery: members
+      members:
+        - 127.0.0.1:15811
+        - 127.0.0.1:15812
+      port: 15811
+      alone-reminder-interval: PT1H

@@ -1,0 +1,15 @@
+vanillabp:
+  prioritized-adapters:
+    - pea
+  adapters:
+    pea:
+      type: process-engine-api
+      name-clash-avoidance: none
+  workflow-modules:
+    election-cache-test-module:
+      adapters:
+        pea:
+          resources-location: classpath:election-cache-test-module/processes/none
+  workflow-adapter-cache:
+    hazelcast:
+      enabled: false
