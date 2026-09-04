@@ -291,19 +291,23 @@ probing walk per node.
 
 ## What the metrics show
 
-The platform counts what the election asks of whatever cache is in use, so
-`vanillabp.workflow.adapter.cache.hits`, `.misses` and `.ended.marks` keep working with this one.
-The numbers only the cache itself can know do not:
+The platform counts what the election asked of whatever cache is in use, so
+`vanillabp.workflow.adapter.cache.hits`, `.misses` and `.ended.marks` are reported with this cache
+like with any other. Those three are the numbers to watch here: misses against hits says whether
+the hints are doing their job, and `.ended.marks` says whether the end of a workflow reaches the
+cache at all.
 
-- `.size` and `.size.ended` report `NaN`. Hazelcast knows the size of the map across the cluster,
-  and handing it over would need an addition to the platform's SPI, which is a story of its own.
-- `.evictions`, `.evictions.unused` and `.lost.hints` stay at zero, and here that is the truth
-  rather than a gap: nothing evicts. This cache has no size bound, entries leave when their
-  lifetime is over, and the eviction-pressure warning of the in-memory default therefore has
-  nothing to warn about. What replaces it as the number to watch is `.misses` against `.hits`.
+A number only an implementation can know carries the name of that implementation, so the ones of
+VanillaBP's in-memory default (`vanillabp.inmemory.election.cache.*`, its size and its evictions)
+are absent while this cache is in use, and nothing pretends otherwise. Most of them could not mean
+anything here anyway: this cache has no size bound, so nothing is ever evicted and there is no
+eviction pressure to warn about.
 
-A cache which fills the heap of the cluster is the case this leaves unwatched, and until the size
-is reported, Hazelcast's own metrics are where an operator sees it.
+What is missing is this cache's own set. Hazelcast knows the size of the map across the cluster,
+the number of members and whether this node is alone, and the last one is the number an operator
+most wants an alert on. Publishing them under `vanillabp.hazelcast.election.cache.*` needs an
+optional Micrometer dependency per platform and is a story of its own. Until then the log is where
+a cluster of one is visible, and Hazelcast's own metrics are where the heap of the map is.
 
 ## Releasing
 

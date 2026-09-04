@@ -16,7 +16,6 @@ import io.vanillabp.electioncache.hazelcast.ElectionCacheMember;
 import io.vanillabp.electioncache.hazelcast.ElectionCacheMessages;
 import io.vanillabp.electioncache.hazelcast.HazelcastElectionCacheProperties;
 import io.vanillabp.integration.adapter.migration.processservice.InMemoryWorkflowAdapterCache;
-import io.vanillabp.integration.adapter.migration.processservice.WorkflowAdapterCacheStatistics;
 import io.vanillabp.integration.config.VanillaBpConfigurationProperties;
 import io.vanillabp.integration.processservice.SpringBootMigrationAdapterAutoConfiguration;
 import io.vanillabp.integration.spi.WorkflowAdapterCache;
@@ -59,8 +58,6 @@ public class HazelcastElectionCacheAutoConfiguration {
    * @param applicationsInstance The Hazelcast the application provides, if it provides
    *          one: a second member in the same JVM would be waste and a second cluster
    *          to reason about
-   * @param statistics The platform's cache statistics, read only where the in-memory
-   *          fallback is built
    * @return The cache VanillaBP consults before it probes the adapters
    */
   @Bean
@@ -69,8 +66,7 @@ public class HazelcastElectionCacheAutoConfiguration {
       final SpringHazelcastElectionCacheProperties properties,
       final VanillaBpConfigurationProperties platformProperties,
       final Environment environment,
-      final ObjectProvider<HazelcastInstance> applicationsInstance,
-      final ObjectProvider<WorkflowAdapterCacheStatistics> statistics) {
+      final ObjectProvider<HazelcastInstance> applicationsInstance) {
 
     properties.validate();
 
@@ -93,7 +89,9 @@ public class HazelcastElectionCacheAutoConfiguration {
                   applicationsInstance.getIfAvailable()));
     } catch (final RuntimeException e) {
       log.warn(ElectionCacheMessages.startFailed(properties), e);
-      return new InMemoryWorkflowAdapterCache(lifetimes, statistics.getIfAvailable());
+      // the platform's own default, which the platform would have built itself: the
+      // numbers it knows about itself come with it and are published under its name
+      return new InMemoryWorkflowAdapterCache(lifetimes);
     }
 
   }
