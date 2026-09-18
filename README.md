@@ -341,3 +341,5 @@ BPMS adapter on the classpath. The
 [Process-Engine-API adapter](https://github.com/vanillabp/process-engine-api-adapter) is that
 adapter here, in test scope: it runs on an in-memory engine, needs neither Docker nor network, and
 is a double. Nothing about this cache depends on which BPMS an application uses.
+
+What a pull request needs beyond a green build is in [`CONTRIBUTING.md`](./CONTRIBUTING.md).
