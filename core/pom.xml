@@ -28,6 +28,7 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <!-- the election itself, to prove that a hint one node wrote routes the walk of
