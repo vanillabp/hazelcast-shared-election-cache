@@ -201,6 +201,15 @@
           <version>3.16.0</version>
           <configuration>
             <release>${version.java}</release>
+            <compilerArgs>
+              <!-- the only javadoc check this build has. The release parent runs the
+                   javadoc plugin when a release is built and lets it pass everything, so
+                   nothing read these comments before. javac reads them all, down to a
+                   private field, and a link which no longer resolves fails the build.
+                   'missing' is left out: a comment which was never written is a warning
+                   and not a defect. -->
+              <arg>-Xdoclint:all,-missing</arg>
+            </compilerArgs>
             <annotationProcessorPaths>
               <path>
                 <groupId>org.projectlombok</groupId>

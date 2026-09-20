@@ -25,6 +25,11 @@ mvn install
 tests load their modules from the local Maven repository, so `package` leaves them with the module
 of the run before. Spotless formats Markdown too.
 
+The javadoc is checked by the compiler. Every module compiles with `-Xdoclint:all,-missing`, so a
+broken `{@link}` or a tag HTML no longer knows fails the build, in a private class as well as in a
+public one. The javadoc plugin of the release parent only renders the documentation a release
+publishes and reports nothing, so the compiler is where a javadoc defect shows up here.
+
 Nothing here needs Docker or a network. Two Hazelcast members in one JVM are the cheapest cluster
 there is and that is what the tests use: one node writes a hint, another one reads it, and the
 election of the platform runs across both. The tests boot a real application, and VanillaBP refuses
