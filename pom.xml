@@ -72,7 +72,7 @@
          the distance between a passing build and the rule is readable without opening
          the report -->
     <coverage.rule>90</coverage.rule>
-    <lombok.version>1.18.46</lombok.version>
+    <lombok.version>1.18.48</lombok.version>
     <adapter-platform.version>2.0.0-SNAPSHOT</adapter-platform.version>
     <!-- the version members are compiled against, and therefore the version the cluster
          of an application's nodes speaks - see the compatibility table in README.md -->
