@@ -23,8 +23,8 @@ import lombok.Setter;
  * <p>
  * What is here is where the members are, what they call themselves and how loud they
  * are about being alone. The defaults are the ones which work on a developer machine
- * without a line of configuration; a container network needs
- * {@link #getDiscovery()}, and that is the one decision this cache cannot make for an
+ * without a line of configuration; a container network needs a value for
+ * {@link #DISCOVERY_PROPERTY}, and that is the one decision this cache cannot make for an
  * application.
  */
 @Getter
@@ -60,7 +60,7 @@ public class HazelcastElectionCacheProperties {
      * A list of SEED addresses, not an inventory: a starting member contacts the
      * addresses it was given, and the first member which answers hands over the full
      * membership. Two of five nodes are enough, and a node nobody lists still joins
-     * as long as one address it names is reachable - see {@link #getMembers()}.
+     * as long as one address it names is reachable - see {@link #MEMBERS_PROPERTY}.
      */
     MEMBERS,
 
@@ -68,8 +68,8 @@ public class HazelcastElectionCacheProperties {
      * Kubernetes, either through the DNS name of a headless service (no address, no
      * multicast, no permission to read the Kubernetes API) or through the Kubernetes
      * API itself. Which of the two is decided by
-     * {@link #getKubernetesServiceDns()} against
-     * {@link #getKubernetesServiceName()}.
+     * {@link #KUBERNETES_SERVICE_DNS_PROPERTY} against
+     * {@link #KUBERNETES_SERVICE_NAME_PROPERTY}.
      */
     KUBERNETES;
 
