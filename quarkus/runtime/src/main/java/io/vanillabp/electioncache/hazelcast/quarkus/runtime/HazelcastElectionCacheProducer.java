@@ -37,6 +37,14 @@ import jakarta.inject.Singleton;
 @ApplicationScoped
 public class HazelcastElectionCacheProducer {
 
+  /**
+   * Quarkus builds the bean, and it keeps the member it started so that
+   * {@link #stopTheMember()} can stop it with the application.
+   */
+  public HazelcastElectionCacheProducer() {
+
+  }
+
   private static final Logger log = LoggerFactory.getLogger(HazelcastElectionCacheProducer.class);
 
   /**
@@ -47,6 +55,10 @@ public class HazelcastElectionCacheProducer {
   private ElectionCacheMember member;
 
   /**
+   * The cache the nodes share, or the platform's in-memory one where this node could not
+   * join a cluster. A producer cannot decline to produce, so the fallback is built here
+   * rather than left to the platform.
+   *
    * @param applicationsInstance The Hazelcast the application provides, if it provides
    *          one: a second member in the same JVM would be waste and a second cluster
    *          to reason about

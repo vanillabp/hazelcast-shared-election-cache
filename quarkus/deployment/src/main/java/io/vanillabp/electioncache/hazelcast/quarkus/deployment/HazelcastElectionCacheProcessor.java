@@ -15,6 +15,14 @@ import io.vanillabp.electioncache.hazelcast.quarkus.runtime.HazelcastElectionCac
  */
 class HazelcastElectionCacheProcessor {
 
+  /**
+   * Quarkus builds the class once per build to call the steps below. There is no state to
+   * set up: what the steps produce is the whole output of this extension's build.
+   */
+  HazelcastElectionCacheProcessor() {
+
+  }
+
   private static final String FEATURE = "vanillabp-hazelcast-election-cache";
 
   /**
@@ -46,6 +54,9 @@ class HazelcastElectionCacheProcessor {
   }
 
   /**
+   * Names the extension, which is how a developer sees in the build log that the shared
+   * election cache is part of the application at all.
+   *
    * @return What the build log names this extension
    */
   @BuildStep
@@ -69,6 +80,8 @@ class HazelcastElectionCacheProcessor {
    * Not covered by a test: this repository builds no native image, so the refusal is a
    * claim about a build nobody here runs. What IS held by a test is the message, which
    * is the part somebody has to be able to act on.
+   *
+   * @param errors Where the refusal is handed to Quarkus, which ends the build with it
    */
   @BuildStep(onlyIf = NativeBuild.class)
   void refuseANativeImage(

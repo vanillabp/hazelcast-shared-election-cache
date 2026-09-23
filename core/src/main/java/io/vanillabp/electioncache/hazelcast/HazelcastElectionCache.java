@@ -36,6 +36,10 @@ public class HazelcastElectionCache implements WorkflowAdapterCache {
   private final ElectionCacheFailures failures;
 
   /**
+   * Takes the map and turns the two lifetimes into milliseconds once. Hazelcast is told
+   * the lifetime of an entry with every write rather than once for the map, because the
+   * map holds the hints of living workflows and of ended ones side by side.
+   *
    * @param instance The Hazelcast member the hints live in
    * @param mapName The name of the map holding the hints
    * @param timeToLive How long the hint of a living workflow is kept - the value of
