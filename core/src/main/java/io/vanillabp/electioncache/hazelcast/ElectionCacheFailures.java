@@ -31,6 +31,14 @@ public class ElectionCacheFailures {
    */
   private final AtomicLong lastLineNanos = new AtomicLong(Long.MIN_VALUE);
 
+  /**
+   * Starts out with nothing suppressed and no line written yet, so the first failure of
+   * an application's life is always logged.
+   *
+   * @param interval How long a failure suppresses the lines of the failures behind it -
+   *          the value of
+   *          <code>vanillabp.workflow-adapter-cache.hazelcast.failure-log-interval</code>
+   */
   public ElectionCacheFailures(
       final Duration interval) {
 

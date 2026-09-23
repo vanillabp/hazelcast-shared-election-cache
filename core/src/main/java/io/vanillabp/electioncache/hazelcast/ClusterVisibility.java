@@ -42,6 +42,20 @@ public class ClusterVisibility implements AutoCloseable {
 
   private UUID membershipListener;
 
+  /**
+   * Collects what the lines below report. Nothing is logged and nothing is watched until
+   * {@link #start()} is called, so a member which fails to start says nothing about a
+   * cluster it never joined.
+   *
+   * @param instance The Hazelcast member whose cluster is watched
+   * @param clusterName The name of the cluster, which is what an operator searches the
+   *          log for
+   * @param properties This cache's own section, for the map, the discovery and how often
+   *          a lonely member repeats itself
+   * @param timeToLive How long the hint of a living workflow is kept, stated at startup
+   *          because it is configured in the platform's section rather than in this one
+   * @param endedTimeToLive How long the hint of a workflow which ended is kept
+   */
   public ClusterVisibility(
       final HazelcastInstance instance,
       final String clusterName,

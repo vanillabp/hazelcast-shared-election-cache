@@ -69,6 +69,16 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <!-- everything this module writes is package-private: Quarkus finds a build step
+               by annotation and nobody programs against it. Without this the javadoc run
+               has nothing to document and says so as an error. -->
+          <show>package</show>
+        </configuration>
+      </plugin>
+      <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <executions>
           <execution>

@@ -28,10 +28,17 @@ mvn install
 tests load their modules from the local Maven repository, so `package` leaves them with the module
 of the run before. Spotless formats Markdown too.
 
-The javadoc is checked by the compiler. Every module compiles with `-Xdoclint:all,-missing`, so a
-broken `{@link}` or a tag HTML no longer knows fails the build, in a private class as well as in a
-public one. The javadoc plugin of the release parent only renders the documentation a release
-publishes and reports nothing, so the compiler is where a javadoc defect shows up here.
+Two tools read the javadoc, and each one sees a part the other misses. The compiler checks every
+class for a broken reference or broken HTML, the package private ones included. The javadoc plugin
+checks what the published documentation shows, so it starts at protected and stops there. One thing
+below protected is shown as well: the fields a serializable class carries into its serialized form,
+which is why a private field of an exception is asked for a comment too.
+
+A comment which is missing breaks the build. Everything this repository publishes has one now, and
+the plugin fails on a warning so that it stays that way. Write the sentence rather than switching
+the check off, and write the one a reader needs: what this repository publishes is read by somebody
+wiring it into an application, and `@return the value` is the same gap in a longer form. A module
+which publishes nothing sets `maven.javadoc.skip`, so a test module is never asked for comments.
 
 Nothing here needs Docker or a network. Two Hazelcast members in one JVM are the cheapest cluster
 there is and that is what the tests use: one node writes a hint, another one reads it, and the

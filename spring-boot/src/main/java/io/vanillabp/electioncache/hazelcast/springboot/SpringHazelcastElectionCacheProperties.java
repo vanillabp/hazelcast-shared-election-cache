@@ -19,4 +19,12 @@ import io.vanillabp.electioncache.hazelcast.HazelcastElectionCacheProperties;
 @ConfigurationProperties(HazelcastElectionCacheProperties.SECTION)
 public class SpringHazelcastElectionCacheProperties extends HazelcastElectionCacheProperties {
 
+  /**
+   * Spring Boot builds the class and fills the inherited setters with what it found.
+   * Nothing is added here on purpose, so a default which changes changes in one place.
+   */
+  public SpringHazelcastElectionCacheProperties() {
+
+  }
+
 }

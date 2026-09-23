@@ -43,6 +43,15 @@ import io.vanillabp.integration.spi.WorkflowAdapterCache;
 })
 public class HazelcastElectionCacheAutoConfiguration {
 
+  /**
+   * Spring Boot builds this class, once, when it applies the auto-configuration. It
+   * holds no state of its own: the member and the cache it produces below are beans and
+   * live as long as the application context does.
+   */
+  public HazelcastElectionCacheAutoConfiguration() {
+
+  }
+
   private static final Logger log = LoggerFactory.getLogger(HazelcastElectionCacheAutoConfiguration.class);
 
   /**

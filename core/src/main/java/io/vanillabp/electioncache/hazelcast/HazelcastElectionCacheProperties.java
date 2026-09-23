@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -29,8 +28,16 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@NoArgsConstructor
 public class HazelcastElectionCacheProperties {
+
+  /**
+   * Builds the section as an application which configured nothing has it. The platform
+   * integration hands the values it found to the setters, so every field a deployment
+   * says nothing about keeps the default written next to it.
+   */
+  public HazelcastElectionCacheProperties() {
+
+  }
 
   /**
    * How a starting member learns the addresses of the members already running. There
@@ -117,53 +124,108 @@ public class HazelcastElectionCacheProperties {
 
   }
 
+  /**
+   * The section this cache's own properties live in. Every key below is built from it,
+   * so the prefix is written once, and every guiding message spells a key out of these
+   * constants rather than out of a literal which the binding could drift away from.
+   */
   public static final String SECTION = "vanillabp.workflow-adapter-cache.hazelcast";
 
+  /**
+   * The key saying whether the cache runs on Hazelcast at all. Spring Boot reads it as
+   * the condition of the auto-configuration, which is why it exists as a constant.
+   */
   public static final String ENABLED_PROPERTY = SECTION
       + ".enabled";
 
+  /**
+   * The key naming the Hazelcast cluster the nodes of the application form.
+   */
   public static final String CLUSTER_NAME_PROPERTY = SECTION
       + ".cluster-name";
 
+  /**
+   * The key naming the Hazelcast map the hints live in.
+   */
   public static final String MAP_NAME_PROPERTY = SECTION
       + ".map-name";
 
+  /**
+   * The key saying how a starting member finds the members already running. It is the
+   * one value this cache cannot guess for a container network.
+   */
   public static final String DISCOVERY_PROPERTY = SECTION
       + ".discovery";
 
+  /**
+   * The key holding the addresses a starting member tries.
+   */
   public static final String MEMBERS_PROPERTY = SECTION
       + ".members";
 
+  /**
+   * The key naming the port the members talk to each other on.
+   */
   public static final String PORT_PROPERTY = SECTION
       + ".port";
 
+  /**
+   * The key saying whether a member whose port is taken tries the next ones.
+   */
   public static final String PORT_AUTO_INCREMENT_PROPERTY = SECTION
       + ".port-auto-increment";
 
+  /**
+   * The key naming the multicast group, read where the discovery is multicast.
+   */
   public static final String MULTICAST_GROUP_PROPERTY = SECTION
       + ".multicast-group";
 
+  /**
+   * The key naming the multicast port, read where the discovery is multicast.
+   */
   public static final String MULTICAST_PORT_PROPERTY = SECTION
       + ".multicast-port";
 
+  /**
+   * The key naming the DNS record of a headless Kubernetes service in front of the pods.
+   */
   public static final String KUBERNETES_SERVICE_DNS_PROPERTY = SECTION
       + ".kubernetes-service-dns";
 
+  /**
+   * The key naming the Kubernetes service whose endpoints are read through the API.
+   */
   public static final String KUBERNETES_SERVICE_NAME_PROPERTY = SECTION
       + ".kubernetes-service-name";
 
+  /**
+   * The key naming the namespace of that service.
+   */
   public static final String KUBERNETES_NAMESPACE_PROPERTY = SECTION
       + ".kubernetes-namespace";
 
+  /**
+   * The key saying how many copies of each partition the cluster keeps.
+   */
   public static final String BACKUP_COUNT_PROPERTY = SECTION
       + ".backup-count";
 
+  /**
+   * The key saying whether a Hazelcast the application already provides is used.
+   */
   public static final String USE_EXISTING_INSTANCE_PROPERTY = SECTION
       + ".use-existing-instance";
 
+  /**
+   * The key saying how often a member which is alone in its cluster repeats that.
+   */
   public static final String ALONE_REMINDER_INTERVAL_PROPERTY = SECTION
       + ".alone-reminder-interval";
 
+  /**
+   * The key saying how often a failing cache reports that it answers as if it were empty.
+   */
   public static final String FAILURE_LOG_INTERVAL_PROPERTY = SECTION
       + ".failure-log-interval";
 
@@ -173,16 +235,46 @@ public class HazelcastElectionCacheProperties {
    */
   public static final String CLUSTER_NAME_SUFFIX = "-vanillabp-election-cache";
 
+  /**
+   * The map name where nothing is configured. It is also the cluster name of last
+   * resort: an application which carries no name of its own has nothing to derive one
+   * from, and two invented names would be two things to look up in a log
+   * ({@link #clusterNameOrDerived(String)}).
+   */
   public static final String DEFAULT_MAP_NAME = "vanillabp-election-cache";
 
+  /**
+   * The way of finding members where nothing is configured. It needs no configuration
+   * of its own, which is why an application works on a developer machine the moment it
+   * adds this dependency.
+   */
   public static final Discovery DEFAULT_DISCOVERY = Discovery.AUTO_DETECT;
 
+  /**
+   * The port where nothing is configured: the one Hazelcast itself starts on, so a
+   * member of this cache sits where an operator expects a Hazelcast member to be.
+   */
   public static final int DEFAULT_PORT = 5701;
 
+  /**
+   * The number of copies where nothing is configured. One, so a rolling restart keeps
+   * the hints; zero is correct as well and costs one probing walk per hint a leaving
+   * node took with it.
+   */
   public static final int DEFAULT_BACKUP_COUNT = 1;
 
+  /**
+   * The reminder interval where nothing is configured. Often enough that somebody who
+   * did not read the boot log still sees it, rarely enough that the warning does not
+   * become noise itself.
+   */
   public static final Duration DEFAULT_ALONE_REMINDER_INTERVAL = Duration.ofMinutes(5);
 
+  /**
+   * The failure interval where nothing is configured. Shorter than the reminder of a
+   * lonely member, because a cache which stopped answering is news while being alone is
+   * a state which lasts.
+   */
   public static final Duration DEFAULT_FAILURE_LOG_INTERVAL = Duration.ofMinutes(1);
 
   /**
