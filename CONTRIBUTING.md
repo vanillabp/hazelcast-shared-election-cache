@@ -40,6 +40,17 @@ the check off, and write the one a reader needs: what this repository publishes 
 wiring it into an application, and `@return the value` is the same gap in a longer form. A module
 which publishes nothing sets `maven.javadoc.skip`, so a test module is never asked for comments.
 
+One thing the javadoc plugin cannot see is what Lombok generates, because it reads the source and
+Lombok writes bytecode. So a published comment names a property in words rather than linking a
+getter which is not in the file, and a published class which takes its constructor from Lombok
+writes that constructor out, because the documentation otherwise shows a parameterless one which
+does not exist.
+
+Two javadoc blocks in a row are the gap neither tool sees. Javadoc keeps the last block before an
+element and drops the earlier ones without a word, so a comment somebody wrote and kept up to date
+appears nowhere. `bin/check-orphaned-javadoc.sh` finds that shape. A block it reports describes
+something, usually the element next door, so hang it back there rather than delete it.
+
 Nothing here needs Docker or a network. Two Hazelcast members in one JVM are the cheapest cluster
 there is and that is what the tests use: one node writes a hint, another one reads it, and the
 election of the platform runs across both. The tests boot a real application, and VanillaBP refuses
