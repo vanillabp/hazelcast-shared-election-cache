@@ -309,7 +309,7 @@ public class HazelcastElectionCacheProperties {
 
   /**
    * The addresses a starting member tries, as <code>host</code> or
-   * <code>host:port</code>, read where {@link #getDiscovery()} is
+   * <code>host:port</code>, read where {@link #DISCOVERY_PROPERTY} is
    * {@link Discovery#MEMBERS}.
    * <p>
    * <strong>Not every node has to be listed.</strong> The member which answers hands
@@ -328,21 +328,21 @@ public class HazelcastElectionCacheProperties {
   private int port = DEFAULT_PORT;
 
   /**
-   * Whether a member whose {@link #getPort()} is taken tries the next ones. Right on
-   * a developer machine running two nodes, and worth switching off in a container,
-   * where a fixed port is what the other members were told about.
+   * Whether a member whose port is taken tries the next ones. Right on a developer
+   * machine running two nodes, and worth switching off in a container, where a fixed
+   * port is what the other members were told about.
    */
   private boolean portAutoIncrement = true;
 
   /**
    * The multicast group, unset meaning Hazelcast's own default. Only read where
-   * {@link #getDiscovery()} is {@link Discovery#MULTICAST}.
+   * {@link #DISCOVERY_PROPERTY} is {@link Discovery#MULTICAST}.
    */
   private String multicastGroup;
 
   /**
    * The multicast port, unset meaning Hazelcast's own default. Only read where
-   * {@link #getDiscovery()} is {@link Discovery#MULTICAST}.
+   * {@link #DISCOVERY_PROPERTY} is {@link Discovery#MULTICAST}.
    */
   private Integer multicastPort;
 
@@ -357,15 +357,15 @@ public class HazelcastElectionCacheProperties {
 
   /**
    * The name of a Kubernetes service whose endpoints are read through the Kubernetes
-   * API. The alternative to {@link #getKubernetesServiceDns()} for a team which
+   * API. The alternative to {@link #KUBERNETES_SERVICE_DNS_PROPERTY} for a team which
    * prefers naming the service over naming a DNS record; it needs a role which allows
    * the pod to read endpoints.
    */
   private String kubernetesServiceName;
 
   /**
-   * The Kubernetes namespace of {@link #getKubernetesServiceName()}, unset meaning
-   * the namespace the pod itself runs in.
+   * The Kubernetes namespace of {@link #KUBERNETES_SERVICE_NAME_PROPERTY}, unset
+   * meaning the namespace the pod itself runs in.
    */
   private String kubernetesNamespace;
 
