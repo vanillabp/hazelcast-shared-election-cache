@@ -8,7 +8,7 @@ import com.hazelcast.core.HazelcastInstance;
 
 import io.vanillabp.electioncache.hazelcast.HazelcastElectionCacheProperties.Discovery;
 import io.vanillabp.integration.spi.WorkflowAdapterCache;
-import io.vanillabp.integration.test.utils.FreePortUtil;
+import io.vanillabp.integration.test.utils.OneFreePortPerJvm;
 
 /**
  * Two members in one JVM, which is the cheapest cluster there is and proves the one
@@ -76,7 +76,7 @@ final class TestCluster implements AutoCloseable {
    */
   static List<String> seedRange() {
 
-    final var basePort = FreePortUtil.getFreePort();
+    final var basePort = OneFreePortPerJvm.getPort();
 
     return List
         .of(
