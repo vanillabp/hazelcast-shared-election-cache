@@ -21,7 +21,7 @@ import io.vanillabp.electioncache.hazelcast.HazelcastElectionCacheProperties;
 import io.vanillabp.integration.adapter.migration.processservice.InMemoryWorkflowAdapterCache;
 import io.vanillabp.integration.spi.WorkflowAdapterCache;
 import io.vanillabp.integration.test.utils.CapturedOutput;
-import io.vanillabp.integration.test.utils.FreePortUtil;
+import io.vanillabp.integration.test.utils.OneFreePortPerJvm;
 import io.vanillabp.integration.test.utils.SuppressOutputExtension;
 
 /**
@@ -42,7 +42,7 @@ public class HazelcastElectionCacheAutoConfigurationTest {
    * which member takes which port does not matter, a seed list is a list of addresses
    * to try.
    */
-  private static final int BASE_PORT = FreePortUtil.getFreePort();
+  private static final int BASE_PORT = OneFreePortPerJvm.getPort();
 
   private static final List<String> SEEDS = List
       .of("127.0.0.1:"
