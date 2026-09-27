@@ -343,3 +343,13 @@ adapter here, in test scope: it runs on an in-memory engine, needs neither Docke
 is a double. Nothing about this cache depends on which BPMS an application uses.
 
 What a pull request needs beyond a green build is in [`CONTRIBUTING.md`](./CONTRIBUTING.md).
+
+A build also runs once a night, without anybody pushing. The workflow *Nightly against the platform
+snapshot* (`.github/workflows/nightly-platform-snapshot.yaml`) builds what a pull request builds,
+with `--update-snapshots`, against whatever the platform published since yesterday, and a red night
+opens an issue labelled `nightly-platform-snapshot`. Without it a platform snapshot can break this
+repository and nobody sees it until the next pull request: on the 26th of September 2026 the
+platform published at 12:19, the last build of the Camunda 7 adapter had run at 10:15, and the
+break surfaced a day and a half later inside somebody's pull request. The night writes down which
+platform snapshot it resolved, with the timestamp and the build number, so a red night can be read
+as a break of the platform or as a break of this repository.
