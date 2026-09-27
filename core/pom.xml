@@ -25,11 +25,6 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <scope>provided</scope>
-    </dependency>
 
     <!-- the election itself, to prove that a hint one node wrote routes the walk of
          another one: the locator is what consults this cache in a running application -->

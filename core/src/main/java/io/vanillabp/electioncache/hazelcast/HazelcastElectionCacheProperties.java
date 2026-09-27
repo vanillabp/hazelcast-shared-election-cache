@@ -4,9 +4,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Getter;
-import lombok.Setter;
-
 /**
  * Everything this cache needs on top of what the platform already asks for
  * (properties section
@@ -26,8 +23,6 @@ import lombok.Setter;
  * {@link #DISCOVERY_PROPERTY}, and that is the one decision this cache cannot make for an
  * application.
  */
-@Getter
-@Setter
 public class HazelcastElectionCacheProperties {
 
   /**
@@ -398,6 +393,374 @@ public class HazelcastElectionCacheProperties {
    * failure of an interval is logged and the rest are counted.
    */
   private Duration failureLogInterval = DEFAULT_FAILURE_LOG_INTERVAL;
+
+  /**
+   * Whether the election cache runs on Hazelcast at all.
+   *
+   * @return Whether the election cache runs on Hazelcast
+   */
+  public boolean isEnabled() {
+
+    return enabled;
+
+  }
+
+  /**
+   * Whether the election cache runs on Hazelcast at all.
+   *
+   * @param enabled Whether the election cache runs on Hazelcast
+   */
+  public void setEnabled(
+      final boolean enabled) {
+
+    this.enabled = enabled;
+
+  }
+
+  /**
+   * The name of the Hazelcast cluster the nodes of this application form.
+   *
+   * @return The configured cluster name, <code>null</code> where none is set
+   */
+  public String getClusterName() {
+
+    return clusterName;
+
+  }
+
+  /**
+   * The name of the Hazelcast cluster the nodes of this application form.
+   *
+   * @param clusterName The name of the Hazelcast cluster, <code>null</code> to derive one
+   */
+  public void setClusterName(
+      final String clusterName) {
+
+    this.clusterName = clusterName;
+
+  }
+
+  /**
+   * The name of the Hazelcast map holding the hints.
+   *
+   * @return The name of the Hazelcast map holding the hints
+   */
+  public String getMapName() {
+
+    return mapName;
+
+  }
+
+  /**
+   * The name of the Hazelcast map holding the hints.
+   *
+   * @param mapName The name of the Hazelcast map holding the hints
+   */
+  public void setMapName(
+      final String mapName) {
+
+    this.mapName = mapName;
+
+  }
+
+  /**
+   * How a starting member finds the members already running.
+   *
+   * @return How a starting member finds the members already running
+   */
+  public Discovery getDiscovery() {
+
+    return discovery;
+
+  }
+
+  /**
+   * How a starting member finds the members already running.
+   *
+   * @param discovery How a starting member finds the members already running
+   */
+  public void setDiscovery(
+      final Discovery discovery) {
+
+    this.discovery = discovery;
+
+  }
+
+  /**
+   * The addresses a starting member tries.
+   *
+   * @return The addresses a starting member tries, never <code>null</code>
+   */
+  public List<String> getMembers() {
+
+    return members;
+
+  }
+
+  /**
+   * The addresses a starting member tries.
+   *
+   * @param members The addresses a starting member tries
+   */
+  public void setMembers(
+      final List<String> members) {
+
+    this.members = members;
+
+  }
+
+  /**
+   * The port this member listens on for the other members.
+   *
+   * @return The port this member listens on for the other members
+   */
+  public int getPort() {
+
+    return port;
+
+  }
+
+  /**
+   * The port this member listens on for the other members.
+   *
+   * @param port The port this member listens on for the other members
+   */
+  public void setPort(
+      final int port) {
+
+    this.port = port;
+
+  }
+
+  /**
+   * Whether a member whose port is taken tries the next ones.
+   *
+   * @return Whether a member whose port is taken tries the next ones
+   */
+  public boolean isPortAutoIncrement() {
+
+    return portAutoIncrement;
+
+  }
+
+  /**
+   * Whether a member whose port is taken tries the next ones.
+   *
+   * @param portAutoIncrement Whether a member whose port is taken tries the next ones
+   */
+  public void setPortAutoIncrement(
+      final boolean portAutoIncrement) {
+
+    this.portAutoIncrement = portAutoIncrement;
+
+  }
+
+  /**
+   * The multicast group, read where the discovery is multicast.
+   *
+   * @return The multicast group, <code>null</code> for Hazelcast's own default
+   */
+  public String getMulticastGroup() {
+
+    return multicastGroup;
+
+  }
+
+  /**
+   * The multicast group, read where the discovery is multicast.
+   *
+   * @param multicastGroup The multicast group, <code>null</code> for Hazelcast's own default
+   */
+  public void setMulticastGroup(
+      final String multicastGroup) {
+
+    this.multicastGroup = multicastGroup;
+
+  }
+
+  /**
+   * The multicast port, read where the discovery is multicast.
+   *
+   * @return The multicast port, <code>null</code> for Hazelcast's own default
+   */
+  public Integer getMulticastPort() {
+
+    return multicastPort;
+
+  }
+
+  /**
+   * The multicast port, read where the discovery is multicast.
+   *
+   * @param multicastPort The multicast port, <code>null</code> for Hazelcast's own default
+   */
+  public void setMulticastPort(
+      final Integer multicastPort) {
+
+    this.multicastPort = multicastPort;
+
+  }
+
+  /**
+   * The DNS name of a headless Kubernetes service in front of the pods.
+   *
+   * @return The DNS name of the headless service, <code>null</code> where none is set
+   */
+  public String getKubernetesServiceDns() {
+
+    return kubernetesServiceDns;
+
+  }
+
+  /**
+   * The DNS name of a headless Kubernetes service in front of the pods.
+   *
+   * @param kubernetesServiceDns The DNS name of a headless service in front of the pods
+   */
+  public void setKubernetesServiceDns(
+      final String kubernetesServiceDns) {
+
+    this.kubernetesServiceDns = kubernetesServiceDns;
+
+  }
+
+  /**
+   * The name of a Kubernetes service whose endpoints are read through the API.
+   *
+   * @return The name of the Kubernetes service, <code>null</code> where none is set
+   */
+  public String getKubernetesServiceName() {
+
+    return kubernetesServiceName;
+
+  }
+
+  /**
+   * The name of a Kubernetes service whose endpoints are read through the API.
+   *
+   * @param kubernetesServiceName The name of the Kubernetes service whose endpoints are read
+   */
+  public void setKubernetesServiceName(
+      final String kubernetesServiceName) {
+
+    this.kubernetesServiceName = kubernetesServiceName;
+
+  }
+
+  /**
+   * The Kubernetes namespace of that service.
+   *
+   * @return The namespace of that service, <code>null</code> for the pod's own
+   */
+  public String getKubernetesNamespace() {
+
+    return kubernetesNamespace;
+
+  }
+
+  /**
+   * The Kubernetes namespace of that service.
+   *
+   * @param kubernetesNamespace The namespace of that service, <code>null</code> for the pod's own
+   */
+  public void setKubernetesNamespace(
+      final String kubernetesNamespace) {
+
+    this.kubernetesNamespace = kubernetesNamespace;
+
+  }
+
+  /**
+   * How many copies of each partition the cluster keeps.
+   *
+   * @return How many copies of each partition the cluster keeps
+   */
+  public int getBackupCount() {
+
+    return backupCount;
+
+  }
+
+  /**
+   * How many copies of each partition the cluster keeps.
+   *
+   * @param backupCount How many copies of each partition the cluster keeps
+   */
+  public void setBackupCount(
+      final int backupCount) {
+
+    this.backupCount = backupCount;
+
+  }
+
+  /**
+   * Whether an instance the application itself provides is used.
+   *
+   * @return Whether an instance the application provides is used
+   */
+  public boolean isUseExistingInstance() {
+
+    return useExistingInstance;
+
+  }
+
+  /**
+   * Whether an instance the application itself provides is used.
+   *
+   * @param useExistingInstance Whether an instance the application provides is used
+   */
+  public void setUseExistingInstance(
+      final boolean useExistingInstance) {
+
+    this.useExistingInstance = useExistingInstance;
+
+  }
+
+  /**
+   * How often a member which is alone in its cluster says so.
+   *
+   * @return How often a member which is alone says so
+   */
+  public Duration getAloneReminderInterval() {
+
+    return aloneReminderInterval;
+
+  }
+
+  /**
+   * How often a member which is alone in its cluster says so.
+   *
+   * @param aloneReminderInterval How often a member which is alone says so
+   */
+  public void setAloneReminderInterval(
+      final Duration aloneReminderInterval) {
+
+    this.aloneReminderInterval = aloneReminderInterval;
+
+  }
+
+  /**
+   * How often a failing cache reports that it answers as if it were empty.
+   *
+   * @return How often a failing cache reports that it answers as if it were empty
+   */
+  public Duration getFailureLogInterval() {
+
+    return failureLogInterval;
+
+  }
+
+  /**
+   * How often a failing cache reports that it answers as if it were empty.
+   *
+   * @param failureLogInterval How often a failing cache reports that it answers as if it were empty
+   */
+  public void setFailureLogInterval(
+      final Duration failureLogInterval) {
+
+    this.failureLogInterval = failureLogInterval;
+
+  }
 
   /**
    * The cluster to join: the configured name, or one derived from the name the
