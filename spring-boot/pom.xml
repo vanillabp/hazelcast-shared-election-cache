@@ -48,7 +48,6 @@
     <dependency>
       <groupId>io.vanillabp</groupId>
       <artifactId>process-engine-api-adapter-spring-boot</artifactId>
-      <version>${adapter-platform.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
