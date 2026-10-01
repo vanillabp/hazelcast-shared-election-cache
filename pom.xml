@@ -140,6 +140,30 @@
         <scope>test</scope>
       </dependency>
 
+      <!-- the BPMS double of the tests. The version stands here and the declarations
+           below leave it out: a published POM which writes a version as nothing but a
+           property name hands that name on to whoever reads the file, because a snapshot
+           is resolved against the newest build of its parent, and the value is gone as
+           soon as that build stops defining the property -->
+      <dependency>
+        <groupId>io.vanillabp</groupId>
+        <artifactId>process-engine-api-adapter-spring-boot</artifactId>
+        <version>${adapter-platform.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>io.vanillabp</groupId>
+        <artifactId>process-engine-api-adapter-quarkus</artifactId>
+        <version>${adapter-platform.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>io.vanillabp</groupId>
+        <artifactId>process-engine-api-adapter-quarkus-deployment</artifactId>
+        <version>${adapter-platform.version}</version>
+        <scope>test</scope>
+      </dependency>
+
       <!-- Own modules -->
       <dependency>
         <groupId>io.vanillabp</groupId>

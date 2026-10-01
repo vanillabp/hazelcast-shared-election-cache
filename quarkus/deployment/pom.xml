@@ -55,13 +55,11 @@
     <dependency>
       <groupId>io.vanillabp</groupId>
       <artifactId>process-engine-api-adapter-quarkus</artifactId>
-      <version>${adapter-platform.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>io.vanillabp</groupId>
       <artifactId>process-engine-api-adapter-quarkus-deployment</artifactId>
-      <version>${adapter-platform.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
