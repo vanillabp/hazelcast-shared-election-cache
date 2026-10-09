@@ -150,13 +150,17 @@ decision number you used while you were writing, and once a pull request is merg
 bin/check-decision-numbers.sh
 ```
 
-The *Publish to GitHub Packages* workflow builds and tests every pull request and publishes nothing
+The *Build and publish snapshots* workflow builds and tests every pull request and publishes nothing
 from a branch. A red check is a finding about your change. Read the log and fix what it says rather
 than pushing again to see whether it goes away. Releases are a second workflow, started by hand with
 the version to release, and it refuses to run while a POM still names a SNAPSHOT.
 
+A pull request from a fork builds and tests like any other, because the snapshots it needs can be
+read without a login. It cannot publish anything, because GitHub gives it no secrets of this
+repository.
+
 `main` carries a ruleset, and it requires two green checks before a merge: `publish`, which is the
-build of *Publish to GitHub Packages*, and `orphaned-javadoc-check`, which is the *Checks* workflow
+build of *Build and publish snapshots*, and `orphaned-javadoc-check`, which is the *Checks* workflow
 running the script named above. While one of them is red, GitHub does not offer the merge.
 
 ## License
