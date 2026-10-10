@@ -44,7 +44,7 @@
   <scm>
     <connection>scm:git:https://github.com/vanillabp/hazelcast-shared-election-cache.git</connection>
     <developerConnection>scm:git:https://github.com/vanillabp/hazelcast-shared-election-cache.git</developerConnection>
-    <url>http://github.com/vanillabp/hazelcast-shared-election-cache/tree/main</url>
+    <url>https://github.com/vanillabp/hazelcast-shared-election-cache/tree/main</url>
   </scm>
 
   <properties>
