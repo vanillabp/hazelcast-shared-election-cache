@@ -14,15 +14,15 @@ import com.hazelcast.cluster.MembershipListener;
 import com.hazelcast.core.HazelcastInstance;
 
 /**
- * What the log says about the cluster, which is the only place an operator can read
+ * What the log says about the cluster. The log is the only place where an operator can see
  * whether the cache is shared at all.
  * <p>
- * A member which finds nobody forms a cluster of one, and everything looks fine: no
- * exception, no failed request, an application behaving exactly as it did with the
- * in-memory default. So the size is stated at startup, every membership change is
- * logged with the size after it, and a member which is alone repeats that for as long
- * as it stays alone. Telling "the cache is shared" from "the cache exists" must not
- * require a debugger.
+ * A member which finds nobody forms a cluster of one, and everything looks fine. There is no
+ * exception and no failed request, and the application behaves exactly as with the in-memory
+ * default. So the size of the cluster is logged at startup. Every change of the members is logged
+ * with the size after it. And a member which is alone says so again and again, for as long as it
+ * stays alone. Nobody should need a debugger to tell "the cache is shared" from "the cache
+ * exists".
  */
 public class ClusterVisibility implements AutoCloseable {
 
@@ -43,17 +43,16 @@ public class ClusterVisibility implements AutoCloseable {
   private UUID membershipListener;
 
   /**
-   * Collects what the lines below report. Nothing is logged and nothing is watched until
-   * {@link #start()} is called, so a member which fails to start says nothing about a
-   * cluster it never joined.
+   * Collects what the log lines report. Nothing is logged and nothing is watched until
+   * {@link #start()} is called. So a member which fails to start says nothing about a cluster it
+   * never joined.
    *
    * @param instance The Hazelcast member whose cluster is watched
-   * @param clusterName The name of the cluster, which is what an operator searches the
-   *          log for
-   * @param properties This cache's own section, for the map, the discovery and how often
-   *          a lonely member repeats itself
-   * @param timeToLive How long the hint of a living workflow is kept, stated at startup
-   *          because it is configured in the platform's section rather than in this one
+   * @param clusterName The name of the cluster. An operator searches the log for it
+   * @param properties The section of this cache: the map, the discovery, and how often a member
+   *          which is alone repeats its warning
+   * @param timeToLive How long the hint of a running workflow is kept. It is logged at startup,
+   *          because it is configured in the section of the platform, not in this one
    * @param endedTimeToLive How long the hint of a workflow which ended is kept
    */
   public ClusterVisibility(
@@ -72,7 +71,7 @@ public class ClusterVisibility implements AutoCloseable {
   }
 
   /**
-   * Says where the cluster stands and starts watching it.
+   * Logs the state of the cluster and starts watching it.
    */
   public void start() {
 
@@ -99,8 +98,8 @@ public class ClusterVisibility implements AutoCloseable {
           thread.setDaemon(true);
           return thread;
         });
-    // starts immediately: a node which comes up alone should say so in the same breath
-    // as the line above, not five minutes later
+    // starts at once: a node which comes up alone should say so right after the line
+    // above, not five minutes later
     aloneReminder
         .scheduleWithFixedDelay(
             this::warnWhileAlone,
@@ -111,8 +110,8 @@ public class ClusterVisibility implements AutoCloseable {
   }
 
   /**
-   * Warns while this member is the whole cluster. It is a repeated warning on purpose:
-   * this is the one state which is both wrong and invisible.
+   * Warns while this member is the whole cluster. The warning repeats on purpose. This is the
+   * one state which is wrong and still invisible.
    */
   private void warnWhileAlone() {
 
@@ -122,8 +121,8 @@ public class ClusterVisibility implements AutoCloseable {
       }
       log.warn(ElectionCacheMessages.alone(clusterName, properties));
     } catch (final Exception e) {
-      // a member which is shutting down answers nothing, and a reminder is not worth a
-      // stack trace on the way out
+      // a member which shuts down answers nothing, and a reminder is not worth a stack
+      // trace on the way out
       log.debug("The VanillaBP election cache could not read its cluster's size", e);
     }
 
@@ -148,7 +147,7 @@ public class ClusterVisibility implements AutoCloseable {
   }
 
   /**
-   * Every change of the membership, with the size after it.
+   * Logs every member which joins or leaves, with the size of the cluster after it.
    */
   private class Membership implements MembershipListener {
 

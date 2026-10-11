@@ -3,29 +3,28 @@ package io.vanillabp.electioncache.hazelcast;
 import io.vanillabp.integration.spi.StoredKey;
 
 /**
- * The key of one hint, as the three strings the platform hands over: workflow module,
- * BPMN process and the workflow-aggregate ID in the serialized form the outbox uses.
+ * The key of one hint. It is built from the three strings the platform hands over: the workflow
+ * module, the BPMN process and the workflow-aggregate ID, serialized the way the outbox does it.
  * <p>
- * The aggregate ID comes last because it is the only part which can contain anything -
- * a composite business key, a URN, whatever the domain model uses as an identity. The
- * two parts before it cannot contain the separator: a BPMN process ID is an XML name
- * and a workflow module ID is a configuration key.
+ * The aggregate ID comes last, because it is the only part which may contain any character. It
+ * may be a composite business key, a URN, or whatever the domain model uses as an identity. The
+ * two parts before it cannot contain the separator. A BPMN process ID is an XML name, and a
+ * workflow module ID is a configuration key.
  * <p>
- * The length is bounded the way the platform bounds the keys it persists
- * ({@link StoredKey}), and for the same reason as there rather than because Hazelcast
- * needs it: a key which nobody reads back for a human costs nothing as a digest, and
- * two VanillaBP keys of the same shape should not be bounded by two different rules.
+ * The length is limited the way the platform limits the keys it stores ({@link StoredKey}).
+ * Hazelcast does not need that. But nobody reads such a key back for a human, so a digest costs
+ * nothing. And two VanillaBP keys of the same shape should not follow two different rules.
  */
 public final class ElectionCacheKey {
 
   /**
-   * What separates the three parts. It cannot appear in a workflow module ID or in a
-   * BPMN process ID, which is what keeps two different triples from producing one key.
+   * Separates the three parts. It cannot appear in a workflow module ID or in a BPMN process ID.
+   * So two different triples never make the same key.
    */
   static final char SEPARATOR = '|';
 
   /**
-   * The number of characters a key may have before it is stored as a digest of itself.
+   * How many characters a key may have. A longer key is stored as a digest of itself.
    */
   static final int MAX_LENGTH = 512;
 
