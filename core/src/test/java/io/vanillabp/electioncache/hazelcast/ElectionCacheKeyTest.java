@@ -10,10 +10,10 @@ import io.vanillabp.integration.spi.StoredKey;
 import io.vanillabp.integration.test.utils.SuppressOutputExtension;
 
 /**
- * What one hint is filed under. The key is the only thing of this cache which two
- * nodes have to agree on without talking about it, so its shape is pinned here: a
- * changed separator or a changed boundary would make the hints of a node running the
- * new version invisible to a node running the old one during a rolling restart.
+ * Holds the key one hint is stored under. The key is the only thing of this cache which two nodes
+ * must agree on without talking about it. So its shape is fixed here. During a rolling restart, a
+ * changed separator or a changed length limit would hide the hints of a node with the new version
+ * from a node with the old one.
  */
 @ExtendWith(SuppressOutputExtension.class)
 public class ElectionCacheKeyTest {
@@ -46,7 +46,7 @@ public class ElectionCacheKeyTest {
 
     assertThat(key).startsWith(StoredKey.HASH_PREFIX);
     assertThat(key).hasSize(StoredKey.HASH_PREFIX.length() + 64);
-    // and it is the digest of the readable key, not of something assembled differently
+    // it is the digest of the readable key, not of a key built in some other way
     assertThat(key)
         .isEqualTo(StoredKey.of("module|process|"
             + aggregateId, ElectionCacheKey.MAX_LENGTH));

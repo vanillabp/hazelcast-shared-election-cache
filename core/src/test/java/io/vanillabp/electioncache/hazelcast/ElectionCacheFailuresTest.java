@@ -14,10 +14,10 @@ import io.vanillabp.integration.test.utils.CapturedOutput;
 import io.vanillabp.integration.test.utils.SuppressOutputExtension;
 
 /**
- * How loud a cache which cannot reach Hazelcast is. A node whose cluster is gone fails
- * every single call, and a line per call would bury the reason under the symptom: the
- * first failure of an interval is logged and the rest are counted, so the next line says
- * how long this has been going on.
+ * Holds how much a cache logs when it cannot reach Hazelcast. A node whose cluster is gone fails
+ * every single call. A line per call would hide the cause under its symptoms. So the first
+ * failure of an interval is logged, and the rest are counted. The next line then says how long
+ * this has been going on.
  */
 @ExtendWith(SuppressOutputExtension.class)
 public class ElectionCacheFailuresTest {
@@ -40,7 +40,6 @@ public class ElectionCacheFailuresTest {
     final var logged = output.getAll();
     assertThat(logged).contains("read the hint of a workflow");
     assertThat(logged).contains(HazelcastInstanceNotActiveException.class.getSimpleName());
-    // one line, not three
     assertThat(countOf(output, "as if it were empty")).isEqualTo(linesBefore + 1);
 
   }
@@ -69,8 +68,8 @@ public class ElectionCacheFailuresTest {
   }
 
   /**
-   * How often a sentence was logged. Counted rather than looked for: the captured output
-   * carries what the tests before this one in the same class printed as well.
+   * How often a sentence was logged. It is counted, because finding it is not enough. The
+   * captured output also holds what the tests before this one in the same class printed.
    */
   private static int countOf(
       final CapturedOutput output,

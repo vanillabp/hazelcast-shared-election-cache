@@ -12,10 +12,9 @@ import io.vanillabp.electioncache.hazelcast.HazelcastElectionCacheProperties.Dis
 import io.vanillabp.integration.test.utils.SuppressOutputExtension;
 
 /**
- * What each way of finding members turns into. Hazelcast refuses a configuration with
- * two of them enabled and has its auto-detection on until something else is, so every
- * branch has to switch the others off - which is the kind of thing that is right once
- * and wrong after the next addition.
+ * Holds what each way of finding members turns into. Hazelcast refuses a configuration with two
+ * of them turned on. And its auto-detection stays on until something else is turned on. So every
+ * way has to switch the others off. Such code is right once, and wrong after the next addition.
  */
 @ExtendWith(SuppressOutputExtension.class)
 public class ElectionCacheMemberConfigTest {
@@ -49,7 +48,7 @@ public class ElectionCacheMemberConfigTest {
     assertThat(join.getMulticastConfig().getMulticastGroup()).isEqualTo("224.2.2.9");
     assertThat(join.getMulticastConfig().getMulticastPort()).isEqualTo(54399);
 
-    // and Hazelcast's own defaults stay where nothing is configured
+    // where nothing is configured, the defaults of Hazelcast stay
     final var plain = new HazelcastElectionCacheProperties();
     plain.setDiscovery(Discovery.MULTICAST);
     final var plainMulticast = config(plain).getNetworkConfig().getJoin().getMulticastConfig();
@@ -130,8 +129,8 @@ public class ElectionCacheMemberConfigTest {
 
     final var map = config.getMapConfig(properties.getMapName());
     assertThat(map.getBackupCount()).isZero();
-    // the lifetime travels with each entry: a map-wide one could not tell a living
-    // workflow from an ended one
+    // each entry carries its own lifetime. One lifetime for the whole map could not
+    // tell a running workflow from an ended one
     assertThat(map.getTimeToLiveSeconds()).isZero();
 
   }

@@ -22,13 +22,12 @@ import io.vanillabp.integration.adapter.spi.WorkflowAwareness;
 import io.vanillabp.integration.test.utils.SuppressOutputExtension;
 
 /**
- * The election itself, which is what a hint is for: the platform's locator asks the
- * adapter a hint names before it asks anybody, and with this cache the hint of one node
- * routes the election of another.
+ * Holds the election itself, which is what a hint is for. The locator of the platform asks the
+ * adapter which a hint names before it asks anybody else. With this cache, the hint of one node
+ * steers the election of another node.
  * <p>
- * The adapters are doubles here on purpose. What is under test is not what a BPMS
- * answers but which BPMS is asked first, and that is decided by the cache the two
- * locators share.
+ * The adapters are test doubles on purpose. The test is not about what a BPMS answers. It is
+ * about which BPMS is asked first, and the cache which the two locators share decides that.
  */
 @ExtendWith(SuppressOutputExtension.class)
 public class ElectionThroughTheSharedCacheTest {
@@ -56,7 +55,7 @@ public class ElectionThroughTheSharedCacheTest {
     camunda8 = mock(MigratableProcessService.class);
     when(camunda7.getAdapterId()).thenReturn("camunda7");
     when(camunda8.getAdapterId()).thenReturn("camunda8");
-    // the order the application configured: without a hint the walk asks Camunda 7 first
+    // the order the application configured: without a hint, Camunda 7 is asked first
     prioritizedAdapters = List.of(camunda7, camunda8);
 
   }
@@ -72,7 +71,7 @@ public class ElectionThroughTheSharedCacheTest {
   @DisplayName("A node which never saw the workflow asks the BPMS the other node elected")
   public void theHintOfOneNodeRoutesTheElectionOfAnother() {
 
-    // the node which started the workflow knows where it went, without probing anybody
+    // the node which started the workflow knows where it went, without asking anybody
     new WorkflowLocator(MODULE, PROCESS, cluster.nodeA()).remember("42", "camunda8");
 
     final var asked = new ArrayList<String>();
@@ -82,8 +81,8 @@ public class ElectionThroughTheSharedCacheTest {
 
     assertThat(location.awareness()).isEqualTo(WorkflowAwareness.ACTIVE);
     assertThat(location.adapter().getAdapterId()).isEqualTo("camunda8");
-    // and the adapter the hint named was the only one asked - Camunda 7 was never
-    // bothered, which is the saving the shared cache buys
+    // only the adapter the hint named was asked. Camunda 7 was never asked, and that
+    // is what the shared cache saves
     assertThat(asked).containsExactly("camunda8");
 
   }
@@ -100,7 +99,7 @@ public class ElectionThroughTheSharedCacheTest {
     assertThat(location.adapter().getAdapterId()).isEqualTo("camunda8");
     assertThat(asked).containsExactly("camunda7", "camunda8");
 
-    // the walk which paid for the answer wrote it down, and the other node reads it
+    // the round which asked the adapters wrote the answer down, and the other node reads it
     final var askedByTheOtherNode = new ArrayList<String>();
     new WorkflowLocator(MODULE, PROCESS, cluster.nodeB())
         .locate(prioritizedAdapters, probe(askedByTheOtherNode), "43", "workflow of aggregate '43'", Patience.NONE);
@@ -120,7 +119,8 @@ public class ElectionThroughTheSharedCacheTest {
     final var location = new WorkflowLocator(MODULE, PROCESS, cluster.nodeB())
         .locate(prioritizedAdapters, probe(asked), "44", "workflow of aggregate '44'", Patience.NONE);
 
-    // the hint was asked first, answered "unknown", and the walk found the holder
+    // the adapter of the hint was asked first and answered "unknown". Then asking the
+    // adapters in turn found the one which holds the workflow
     assertThat(location.adapter().getAdapterId()).isEqualTo("camunda8");
     assertThat(asked).startsWith("camunda7");
 
@@ -133,8 +133,8 @@ public class ElectionThroughTheSharedCacheTest {
   }
 
   /**
-   * The probe of this test: Camunda 8 holds every workflow, Camunda 7 holds none, and
-   * every adapter which is asked says so in the given list.
+   * How the adapters answer in this test. Camunda 8 holds every workflow, Camunda 7 holds none.
+   * Every adapter which is asked adds itself to the given list.
    */
   private static Function<MigratableProcessService<String>, WorkflowAwareness> probe(
       final List<String> asked) {

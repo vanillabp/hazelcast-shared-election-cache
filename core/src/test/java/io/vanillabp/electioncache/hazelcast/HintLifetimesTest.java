@@ -13,15 +13,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import io.vanillabp.integration.test.utils.SuppressOutputExtension;
 
 /**
- * The two lifetimes, in a cluster whose short one is short enough to watch: the hint of
- * a living workflow is worth keeping, the hint of one which ended can never become
- * useful again and has no business occupying a place in infrastructure the application
- * pays for.
+ * Holds the two lifetimes, in a cluster whose short lifetime is short enough to watch. The hint
+ * of a running workflow is worth keeping. The hint of a workflow which ended can never be useful
+ * again. It should not take up space in infrastructure the application pays for.
  * <p>
- * The lifetimes are the platform's properties
+ * The lifetimes are properties of the platform
  * (<code>vanillabp.workflow-adapter-cache.time-to-live</code> and
- * <code>.ended-time-to-live</code>), and they are per entry rather than per map for
- * exactly this reason: one map holds both kinds.
+ * <code>.ended-time-to-live</code>). They are set per entry, not per map, for exactly this reason:
+ * one map holds both kinds.
  */
 @ExtendWith(SuppressOutputExtension.class)
 public class HintLifetimesTest {

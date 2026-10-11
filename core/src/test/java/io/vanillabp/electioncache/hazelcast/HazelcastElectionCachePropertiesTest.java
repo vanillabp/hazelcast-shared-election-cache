@@ -65,7 +65,7 @@ public class HazelcastElectionCachePropertiesTest {
         .contains(HazelcastElectionCacheProperties.CLUSTER_NAME_PROPERTY)
         .contains("join each other");
 
-    // an application which says who it is needs no warning
+    // an application which has a name needs no warning
     assertThat(properties.warnings("taxi-ride")).isEmpty();
 
   }
@@ -127,7 +127,7 @@ public class HazelcastElectionCachePropertiesTest {
     assertThatThrownBy(properties::validate)
         .isInstanceOf(IllegalStateException.class)
         .hasMessageContaining(HazelcastElectionCacheProperties.MEMBERS_PROPERTY)
-        // the sentence which keeps somebody from listing every node of the cluster
+        // this sentence keeps somebody from listing every node of the cluster
         .hasMessageContaining("not every node has to be listed")
         .hasMessageContaining(HazelcastElectionCacheProperties.KUBERNETES_SERVICE_DNS_PROPERTY);
 

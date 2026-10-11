@@ -11,14 +11,13 @@ import io.vanillabp.integration.spi.WorkflowAdapterCache;
 import io.vanillabp.integration.test.utils.OneFreePortPerJvm;
 
 /**
- * Two members in one JVM, which is the cheapest cluster there is and proves the one
- * thing that matters: what one node writes, another node reads.
+ * Two members in one JVM. That is the cheapest cluster there is, and it shows the one thing that
+ * matters: what one node writes, another node reads.
  * <p>
- * They find each other by a list of addresses rather than by multicast, because a
- * container network filters multicast and a test which depends on it is a test which
- * fails on somebody else's machine. Each member is started through the same code an
- * application starts it with, so the configuration this repository builds is the
- * configuration under test.
+ * They find each other by a list of addresses, not by multicast. A container network filters
+ * multicast, and a test which depends on it fails on somebody else's machine. Each member is
+ * started by the same code which an application uses. So the configuration this repository builds
+ * is the configuration under test.
  */
 final class TestCluster implements AutoCloseable {
 
@@ -38,9 +37,9 @@ final class TestCluster implements AutoCloseable {
   /**
    * Starts two members which have found each other.
    *
-   * @param clusterName A name of this test's own, so two test classes running in one
+   * @param clusterName A name which only this test uses. So two test classes which run in one
    *          JVM never end up in one cluster
-   * @param timeToLive The lifetime of the hint of a living workflow
+   * @param timeToLive The lifetime of the hint of a running workflow
    * @param endedTimeToLive The lifetime of the hint of a workflow which ended
    * @return The cluster
    */
@@ -66,11 +65,11 @@ final class TestCluster implements AutoCloseable {
   }
 
   /**
-   * A range of addresses starting at a port which was free a moment ago. The members of
-   * a test take the first free port of that range and look for each other along all of
-   * it, which is what keeps a port left in TIME_WAIT by the previous test class from
-   * failing the next one. Which member ends up on which port does not matter: a seed
-   * list is a list of addresses to try.
+   * A range of addresses which starts at a port that was free a moment ago. The members of a test
+   * take the first free port of that range, and they look for each other along all of it. The
+   * previous test class may leave a port in TIME_WAIT, and this keeps that from failing the next
+   * test class. Which member gets which port does not matter. A seed list is a list of addresses
+   * to try.
    *
    * @return The addresses
    */
@@ -92,9 +91,8 @@ final class TestCluster implements AutoCloseable {
   }
 
   /**
-   * The configuration of one member: a cluster of this test's own and the seed range to
-   * look in. What separates two test classes running in one JVM is the cluster name,
-   * not the port.
+   * The configuration of one member: a cluster which only this test uses, and the seed range to
+   * look in. The cluster name keeps two test classes in one JVM apart, not the port.
    *
    * @param clusterName The cluster of this test
    * @param seeds The addresses to try
@@ -110,7 +108,7 @@ final class TestCluster implements AutoCloseable {
     properties.setMembers(seeds);
     properties.setPort(Integer.parseInt(seeds.get(0).split(":")[1]));
     properties.setPortAutoIncrement(true);
-    // a test does not need to be reminded about being alone every five minutes
+    // a test needs no reminder every five minutes that it is alone
     properties.setAloneReminderInterval(Duration.ofHours(1));
     properties.validate();
     return properties;
@@ -129,8 +127,8 @@ final class TestCluster implements AutoCloseable {
   }
 
   /**
-   * The cache of the node which reads - a different member of the same cluster, which
-   * is the whole point.
+   * The cache of the node which reads. It is a different member of the same cluster, and that is
+   * the whole point.
    *
    * @return The cache
    */
@@ -152,8 +150,8 @@ final class TestCluster implements AutoCloseable {
   }
 
   /**
-   * Waits for something the cluster does on its own thread, with an end: a condition
-   * which never comes true is a failed test and not a hanging build.
+   * Waits for something which the cluster does on its own thread, but not forever. A condition
+   * which never comes true fails the test, and the build does not hang.
    *
    * @param condition What is waited for
    * @param whatWasExpected What the failure says

@@ -104,7 +104,7 @@ public class ElectionCacheMessagesTest {
         .contains("role which allows this pod to read endpoints")
         .contains(HazelcastElectionCacheProperties.KUBERNETES_SERVICE_DNS_PROPERTY);
 
-    // the namespace is left out where the pod's own is meant
+    // the namespace is left out if the namespace of the pod itself is meant
     byApi.setKubernetesNamespace(null);
     assertThat(ElectionCacheMessages.whatToCheck(byApi)).doesNotContain("namespace '");
 

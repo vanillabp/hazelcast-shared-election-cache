@@ -13,10 +13,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import io.vanillabp.integration.test.utils.SuppressOutputExtension;
 
 /**
- * The reason this repository exists: a hint one node wrote is a hint every other node
- * has. Two members in one JVM are enough to prove it, and everything else about the
- * cache is a rule which only becomes visible with two of them - which adapter a mark
- * may overwrite, and what a node reads after another one dropped an entry.
+ * Holds the reason why this repository exists: a hint which one node wrote is a hint every other
+ * node has. Two members in one JVM are enough to show it. The other rules of the cache only show
+ * with two members as well: which adapter a mark may overwrite, and what a node reads after
+ * another node dropped an entry.
  */
 @ExtendWith(SuppressOutputExtension.class)
 public class SharedElectionCacheTest {
@@ -71,7 +71,7 @@ public class SharedElectionCacheTest {
 
     assertThat(cluster.nodeA().get(MODULE, PROCESS, "2")).isEmpty();
 
-    // and dropping an entry which is not there is a no-op, not a failure
+    // dropping an entry which is not there does nothing, and it does not fail
     cluster.nodeB().invalidate(MODULE, PROCESS, "2");
 
   }
@@ -80,8 +80,8 @@ public class SharedElectionCacheTest {
   @DisplayName("The end of a workflow leaves a hint naming another adapter alone")
   public void aMarkDoesNotOverwriteAnotherAdapter() {
 
-    // the key names the aggregate and not the instance, so a second workflow on the
-    // same aggregate wrote this hint - and it is the newer knowledge of the two
+    // the key names the aggregate, not the instance. So a second workflow on the same
+    // aggregate wrote this hint, and it is the newer news of the two
     cluster.nodeA().put(MODULE, PROCESS, "3", "camunda8");
 
     cluster.nodeB().putEnded(MODULE, PROCESS, "3", "camunda7");
@@ -98,8 +98,8 @@ public class SharedElectionCacheTest {
 
     cluster.nodeB().putEnded(MODULE, PROCESS, "4", "camunda8");
 
-    // the mark is not a deletion: an operation arriving after the end still asks the
-    // adapter which held the workflow and becomes a warned no-op there
+    // the mark does not delete the hint. An operation which arrives after the end still
+    // asks the adapter which held the workflow. There it does nothing and logs a warning
     assertThat(cluster.nodeA().get(MODULE, PROCESS, "4")).contains("camunda8");
 
   }
