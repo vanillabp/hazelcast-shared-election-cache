@@ -5,23 +5,23 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import io.vanillabp.electioncache.hazelcast.HazelcastElectionCacheProperties;
 
 /**
- * Spring Boot's binding of this cache's own section onto the platform-neutral model.
- * The class exists to carry the annotation and to let the configuration processor write
- * IDE metadata for the inherited properties; every default, every check and every
- * guiding sentence lives in {@link HazelcastElectionCacheProperties}.
+ * Binds the section of this cache in Spring Boot to the model which does not depend on a platform.
+ * The class only carries the annotation, and it lets the configuration processor write IDE
+ * metadata for the inherited properties. Every default, every check and every guiding sentence is
+ * in {@link HazelcastElectionCacheProperties}.
  * <p>
  * The section sits INSIDE the one the platform already owns
- * (<code>vanillabp.workflow-adapter-cache</code>), because a team which raises the
- * lifetime of a hint and a team which points the members at a Kubernetes service are
- * configuring the same cache. Same-prefix binding classes coexist, and the keys of the
- * platform's own view are ignored by this one.
+ * (<code>vanillabp.workflow-adapter-cache</code>). A team which raises the lifetime of a hint and a
+ * team which points the members at a Kubernetes service configure the same cache. Two binding
+ * classes with the same prefix can live side by side, and this one ignores the keys of the
+ * platform.
  */
 @ConfigurationProperties(HazelcastElectionCacheProperties.SECTION)
 public class SpringHazelcastElectionCacheProperties extends HazelcastElectionCacheProperties {
 
   /**
-   * Spring Boot builds the class and fills the inherited setters with what it found.
-   * Nothing is added here on purpose, so a default which changes changes in one place.
+   * Spring Boot creates the class and passes what it found to the inherited setters. Nothing is
+   * added here, on purpose. So a default is changed in one place only.
    */
   public SpringHazelcastElectionCacheProperties() {
 

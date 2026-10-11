@@ -25,10 +25,9 @@ import io.vanillabp.integration.test.utils.OneFreePortPerJvm;
 import io.vanillabp.integration.test.utils.SuppressOutputExtension;
 
 /**
- * What an application on Spring Boot has to write to share its elections: the
- * dependency, and the settings which say where the other nodes are. This test is that
- * claim - it boots the auto-configuration the way an application does and asks the
- * context for the bean VanillaBP consults.
+ * Holds what an application on Spring Boot has to write to share its elections: the dependency,
+ * and the settings which say where the other nodes are. The test starts the auto-configuration the
+ * way an application does. Then it asks the context for the bean VanillaBP uses.
  */
 @ExtendWith(SuppressOutputExtension.class)
 public class HazelcastElectionCacheAutoConfigurationTest {
@@ -38,8 +37,8 @@ public class HazelcastElectionCacheAutoConfigurationTest {
   private static final String PROCESS = "ride";
 
   /**
-   * A cluster of this test's own, and a range of addresses to look in rather than one:
-   * which member takes which port does not matter, a seed list is a list of addresses
+   * The first port of a range of addresses which only this test uses. A range, not one address,
+   * because it does not matter which member takes which port. A seed list is a list of addresses
    * to try.
    */
   private static final int BASE_PORT = OneFreePortPerJvm.getPort();
@@ -82,7 +81,7 @@ public class HazelcastElectionCacheAutoConfigurationTest {
           instanceOfTheApplication.set(cache.instance());
         });
 
-    // the context which built the member took it down again
+    // the context which started the member shut it down again
     assertThat(instanceOfTheApplication.get().getLifecycleService().isRunning()).isFalse();
 
   }
@@ -106,8 +105,8 @@ public class HazelcastElectionCacheAutoConfigurationTest {
 
             cache.put(MODULE, PROCESS, "1", "camunda8");
 
-            // read through the OTHER member, which is what a second node of the
-            // application is
+            // read through the OTHER member, which stands for a second node of the
+            // application
             assertThat(anotherNode.cache().get(MODULE, PROCESS, "1")).contains("camunda8");
 
             anotherNode.cache().put(MODULE, PROCESS, "2", "camunda7");
@@ -167,7 +166,7 @@ public class HazelcastElectionCacheAutoConfigurationTest {
         .run(context -> {
           assertThat(context).doesNotHaveBean(WorkflowAdapterCache.class);
           assertThat(context).doesNotHaveBean(ManagedElectionCache.class);
-          // and no member was started: what would have started one is the bean above
+          // no member was started. Only the bean above would have started one
           assertThat(runningMembers()).isEqualTo(membersRunningBefore);
         });
 
@@ -222,7 +221,7 @@ public class HazelcastElectionCacheAutoConfigurationTest {
         .run(context -> {
           final var cache = context.getBean(ManagedElectionCache.class);
           assertThat(cache.clusterName()).isEqualTo("the-applications-own-cluster");
-          // the application's instance itself, not a second member beside it
+          // the instance of the application itself, not a second member next to it
           assertThat(cache.instance()).isSameAs(context.getBean(HazelcastInstance.class));
 
           context.getBean(WorkflowAdapterCache.class).put(MODULE, PROCESS, "1", "camunda8");
@@ -237,7 +236,7 @@ public class HazelcastElectionCacheAutoConfigurationTest {
   }
 
   /**
-   * The configuration of a member which is not this application: same cluster, same
+   * The configuration of a member which is not this application: the same cluster, the same
    * seeds, a port of its own.
    */
   private static HazelcastElectionCacheProperties propertiesOfAnotherNode(
@@ -255,10 +254,10 @@ public class HazelcastElectionCacheAutoConfigurationTest {
   }
 
   /**
-   * How many Hazelcast members are running in this JVM. Only ever compared against a
-   * reading of its own: Spring keeps every test context until the JVM exits, so the
-   * members of whatever ran before are still in this list, and an absolute number would
-   * depend on the order the test classes happen to run in.
+   * How many Hazelcast members run in this JVM. The number is only compared with an earlier
+   * reading of itself. Spring keeps every test context until the JVM exits, so the members of
+   * every test which ran before are still in this list. A fixed number would depend on the order
+   * in which the test classes run.
    */
   private static int runningMembers() {
 
@@ -283,8 +282,8 @@ public class HazelcastElectionCacheAutoConfigurationTest {
   }
 
   /**
-   * An application which already runs Hazelcast. A second member in the same JVM would
-   * be waste and a second cluster to reason about, so the cache moves into this one.
+   * An application which already runs Hazelcast. A second member in the same JVM would waste
+   * resources, and it would be a second cluster to think about. So the cache uses this one.
    */
   @Configuration(proxyBeanMethods = false)
   static class AnApplicationWithItsOwnHazelcast {
@@ -313,8 +312,8 @@ public class HazelcastElectionCacheAutoConfigurationTest {
   }
 
   /**
-   * An application whose infrastructure is neither Hazelcast nor anything this
-   * repository supports writes its own cache, and that stays a first-class case.
+   * An application which uses neither Hazelcast nor anything else this repository supports. It
+   * writes its own cache, and that case stays fully supported.
    */
   @Configuration(proxyBeanMethods = false)
   static class AnApplicationWithItsOwnCache {
