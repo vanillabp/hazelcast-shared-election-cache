@@ -21,14 +21,14 @@ import io.vanillabp.integration.test.utils.SuppressOutputExtension;
 import jakarta.inject.Inject;
 
 /**
- * The acceptance test of this repository on Quarkus: an application which boots
- * VanillaBP with a BPMS adapter and this extension gets the shared cache, and the
- * in-memory default of the platform steps back without anybody wiring anything.
+ * The acceptance test of this repository on Quarkus. It holds that an application which starts
+ * VanillaBP with a BPMS adapter and this extension gets the shared cache. The in-memory default
+ * of the platform steps back, and nobody has to wire anything.
  * <p>
- * That the hints really leave this node is proven with a second member started inside
- * the test: what the application's bean writes is what that member reads. The lifetimes
- * are asserted here as well, because they are the platform's properties rather than this
- * repository's and reading the wrong ones would look like nothing at all.
+ * A second member, started inside the test, shows that the hints really leave this node. What the
+ * bean of the application writes, that member reads. The test checks the lifetimes as well. They
+ * are properties of the platform, not of this repository, and reading the wrong ones would show no
+ * visible error at all.
  */
 @ExtendWith(SuppressOutputExtension.class)
 public class TheApplicationGetsTheSharedCacheTest {
@@ -51,7 +51,7 @@ public class TheApplicationGetsTheSharedCacheTest {
   @DisplayName("The application's election cache is the Hazelcast one, shared with the next node")
   public void theApplicationSharesItsElections() {
 
-    // the bean this extension contributes, and not the platform's in-memory default
+    // the bean of this extension, not the in-memory default of the platform
     assertThat(cacheOfTheApplication).isInstanceOf(HazelcastElectionCache.class);
 
     final var theNextNode = ElectionCacheMember
@@ -90,8 +90,7 @@ public class TheApplicationGetsTheSharedCacheTest {
   }
 
   /**
-   * The second node of the same application: the same cluster, the same seeds, the other
-   * port.
+   * The second node of the same application: the same cluster, the same seeds, the other port.
    */
   private static HazelcastElectionCacheProperties propertiesOfTheNextNode() {
 

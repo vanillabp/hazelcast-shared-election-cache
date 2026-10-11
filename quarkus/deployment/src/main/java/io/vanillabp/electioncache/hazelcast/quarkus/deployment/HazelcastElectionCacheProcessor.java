@@ -9,15 +9,15 @@ import io.quarkus.deployment.pkg.steps.NativeBuild;
 import io.vanillabp.electioncache.hazelcast.quarkus.runtime.HazelcastElectionCacheProducer;
 
 /**
- * Quarkus extension deployment of the shared election cache: it registers the producer
- * of the cache bean, which is all the platform needs to prefer it over its own in-memory
- * default.
+ * The deployment part of the Quarkus extension for the shared election cache. It registers the
+ * producer of the cache bean. That is all the platform needs to use it instead of its own
+ * in-memory default.
  */
 class HazelcastElectionCacheProcessor {
 
   /**
-   * Quarkus builds the class once per build to call the steps below. There is no state to
-   * set up: what the steps produce is the whole output of this extension's build.
+   * Quarkus creates the class once per build to call the steps below. There is no state to set
+   * up. What the steps produce is all that this extension adds to the build.
    */
   HazelcastElectionCacheProcessor() {
 
@@ -26,8 +26,8 @@ class HazelcastElectionCacheProcessor {
   private static final String FEATURE = "vanillabp-hazelcast-election-cache";
 
   /**
-   * What a native build is told. Package-private so the test asserting it can read the
-   * text rather than a copy of it.
+   * What a native build is told. It is package-private, so the test can check this text and not a
+   * copy of it.
    */
   static final String NATIVE_IMAGE_REFUSAL = """
       The VanillaBP election cache on Hazelcast cannot be built into a native image: it runs an \
@@ -54,8 +54,8 @@ class HazelcastElectionCacheProcessor {
   }
 
   /**
-   * Names the extension, which is how a developer sees in the build log that the shared
-   * election cache is part of the application at all.
+   * Names the extension. That is how a developer sees in the build log that the shared election
+   * cache is part of the application at all.
    *
    * @return What the build log names this extension
    */
@@ -67,19 +67,18 @@ class HazelcastElectionCacheProcessor {
   }
 
   /**
-   * Refuses a native build rather than letting it produce an image whose Hazelcast
-   * member fails at startup. An embedded member is not what a native image can hold
-   * (its reflection, its serialization and its own class loading are what such an image
-   * takes away), and this cache is a member rather than a client because the nodes of
-   * the application are the cluster (see decision 1 in the repository's DECISIONS.md).
+   * Refuses a native build. Otherwise the build would make an image whose Hazelcast member fails
+   * at startup. A native image cannot hold an embedded member, because it takes away reflection,
+   * serialization and the class loading of Hazelcast. And this cache is a member, not a client,
+   * because the nodes of the application are the cluster (see decision 1 in the repository's
+   * DECISIONS.md).
    * <p>
-   * The message names the way out, because a team which chose a native image did so for
-   * a reason: remove this dependency and leave the election cache to VanillaBP's
-   * in-memory default, which costs one probing walk per node and nothing else.
+   * The message names the way out, because a team which chose a native image had a reason for it.
+   * They remove this dependency and leave the election cache to the in-memory default of
+   * VanillaBP. That costs one round of asking the adapters per node, and nothing else.
    * <p>
-   * Not covered by a test: this repository builds no native image, so the refusal is a
-   * claim about a build nobody here runs. What IS held by a test is the message, which
-   * is the part somebody has to be able to act on.
+   * No test covers the refusal. This repository builds no native image, so nobody here runs such
+   * a build. A test DOES hold the message, because that is the part somebody has to act on.
    *
    * @param errors Where the refusal is handed to Quarkus, which ends the build with it
    */
