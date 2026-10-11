@@ -1,16 +1,15 @@
 # Contributing
 
-This repository holds one implementation of VanillaBP's `WorkflowAdapterCache`: the nodes of an
+This repository holds one implementation of VanillaBP's `WorkflowAdapterCache`. The nodes of an
 application form a small Hazelcast cluster among themselves and share which BPMS holds which
-workflow. It is not a BPMS adapter and it carries no business rules. Everything it does for the
-people using it is in [`README.md`](./README.md), which is the only documentation here, because
-there is not enough of it to justify a wiki. The concept behind the cache belongs to the platform
-and is documented
+workflow. It is not a BPMS adapter, and it has no business rules. Everything it does for its users
+is in [`README.md`](./README.md). That is the only documentation here, because there is too little
+to fill a wiki. The idea behind the cache belongs to the platform, and the platform explains it
 [there](https://github.com/vanillabp/adapter-platform-integration/wiki/BPMS-migration#the-election-cache).
 
 Where the rules are: [`AGENTS.md`](./AGENTS.md) says how work is done here, in the form an agent
-reads, and [`DECISIONS.md`](./DECISIONS.md) holds the decisions several places rely on, which is the
-only thing the code is allowed to cite.
+reads. [`DECISIONS.md`](./DECISIONS.md) holds the decisions several places rely on. It is the only
+thing the code may cite.
 
 ## From a bug to a pull request
 
@@ -37,76 +36,75 @@ Hub, which asks you to sign its contributor license agreement on your first pull
 
 ## Building and testing
 
-A JDK 21 or newer, and Maven, without a wrapper. The workflows build with the JDK named in
-`.github/workflows`, currently 25, so build with that one if you want to see what the pipeline sees.
-The class files stay at Java 21 either way, because that is what the property `version.java` in the
-root `pom.xml` compiles against:
+You need a JDK 21 or newer, and Maven without a wrapper. The workflows build with the JDK named in
+`.github/workflows`, currently 25. Build with that one if you want to see what the pipeline sees.
+The class files stay at Java 21 either way, because the property `version.java` in the root
+`pom.xml` compiles for Java 21:
 
 ```bash
 mvn spotless:apply
 mvn install
 ```
 
-`install` and not `install verify`: `install` already runs every phase `verify` has, and the Quarkus
-tests load their modules from the local Maven repository, so `package` leaves them with the module
-of the run before. Spotless formats Markdown too.
+`install` and not `install verify`: `install` already runs every phase of `verify`. The Quarkus
+tests load their modules from the local Maven repository, so after `package` they would test the
+module of the run before. Spotless formats Markdown too.
 
 Two tools read the javadoc, and each one sees a part the other misses. The compiler checks every
 class for a broken reference or broken HTML, the package private ones included. The javadoc plugin
-checks what the published documentation shows, so it starts at protected and stops there. One thing
-below protected is shown as well: the fields a serializable class carries into its serialized form,
-which is why a private field of an exception is asked for a comment too.
+checks what the published documentation shows, so it looks at protected and public only. One thing
+below protected is shown as well: the fields a serializable class carries into its serialized form.
+That is why a private field of an exception needs a comment too.
 
-A comment which is missing breaks the build. Everything this repository publishes has one now, and
-the plugin fails on a warning so that it stays that way. Write the sentence rather than switching
-the check off, and write the one a reader needs: what this repository publishes is read by somebody
-wiring it into an application, and `@return the value` is the same gap in a longer form. A module
-which publishes nothing sets `maven.javadoc.skip`, so a test module is never asked for comments.
+A missing comment breaks the build. Everything this repository publishes has one now, and the
+plugin fails on a warning so that it stays that way. Write the sentence instead of switching the
+check off. And write the one a reader needs. The reader is somebody who wires this repository into
+an application, and `@return the value` leaves the same gap, only in more words. A module which
+publishes nothing sets `maven.javadoc.skip`, so a test module never needs comments.
 
-One thing the javadoc plugin cannot see is what Lombok generates, because it reads the source and
-Lombok writes bytecode. So a published comment names a property in words rather than linking a
-getter which is not in the file, and a published class which takes its constructor from Lombok
-writes that constructor out, because the documentation otherwise shows a parameterless one which
-does not exist.
+The javadoc plugin cannot see what Lombok generates, because it reads the source and Lombok writes
+bytecode. So a published comment names a property in words. It does not link a getter which is not
+in the file. A published class which gets its constructor from Lombok writes that constructor out.
+Otherwise the documentation shows a constructor without parameters which does not exist.
 
 Two javadoc blocks in a row are the gap neither tool sees. Javadoc keeps the last block before an
-element and drops the earlier ones without a word, so a comment somebody wrote and kept up to date
-appears nowhere. `bin/check-orphaned-javadoc.sh` finds that shape. A block it reports describes
-something, usually the element next door, so hang it back there rather than delete it.
+element and silently drops the earlier ones. So a comment somebody wrote and kept up to date appears
+nowhere. `bin/check-orphaned-javadoc.sh` finds that shape. A block it reports describes something,
+usually the element next to it. Move it back there instead of deleting it.
 
 Nothing here needs Docker or a network. Two Hazelcast members in one JVM are the cheapest cluster
-there is and that is what the tests use: one node writes a hint, another one reads it, and the
+there is, and the tests use exactly that. One node writes a hint, another one reads it, and the
 election of the platform runs across both. The tests boot a real application, and VanillaBP refuses
-to start without a BPMS adapter, so the
+to start without a BPMS adapter. So the
 [Process-Engine-API adapter](https://github.com/vanillabp/process-engine-api-adapter) is on the test
-classpath as a double. Nothing about this cache depends on which BPMS an application uses.
+classpath as a stand-in. Nothing about this cache depends on which BPMS an application uses.
 
-A hint is a hint. Losing one costs a walk through the adapters and never correctness, so the test
-which takes the cache away is as important as the ones which use it. Keep it that way.
+A hint is only a hint. Losing one costs a walk through the adapters and never a wrong result. So the
+test which takes the cache away matters as much as the ones which use it. Keep it that way.
 
 ## What a POM hands an application
 
-A tool which only translates our source belongs in scope `provided`, and the scope stands at the
-declaration in the module which uses the tool. Lombok is such a tool, an annotation processor is
-another. An application asked for a workflow engine, and every jar it did not ask for is one more
-thing to ship and to answer a CVE report about.
+A tool which only translates our source belongs in scope `provided`. Write the scope at the
+dependency in the module which uses the tool. Lombok is such a tool, and so is an annotation
+processor. An application asked for a workflow engine. Every jar it did not ask for is one more
+thing to ship, and one more thing to answer a CVE report (a published security issue) about.
 
-Writing `<optional>true</optional>` in a `dependencyManagement` does not do it. Maven copies a
-managed version, scope and exclusions into a dependency and leaves the optional flag behind, so the
-POM we publish says nothing at all about that dependency. Lombok reached the runtime classpath of
-every application that way, here and in the platform.
+`<optional>true</optional>` in a `dependencyManagement` does not work. Maven copies a managed
+version, scope and exclusions into a dependency, but not the optional flag. So the POM we publish
+says nothing at all about that dependency. That is how Lombok reached the runtime classpath of every
+application, here and in the platform.
 
 ## A POM comment says what this POM does
 
-A comment in a POM says what this POM sets and why it differs from what it would get for free. It
-does not repeat what the parent sets. `io.vanillabp:release-parent` is released on its own schedule,
-so a copy of its settings in a child here goes stale without anything noticing. The javadoc
-comments of three POMs in this organisation did exactly that: they said the parent switched the
-javadoc check off, after a release of it had switched the check on.
+A comment in a POM says what this POM sets, and why that differs from what it would get anyway. It
+does not repeat what the parent sets. `io.vanillabp:release-parent` is released on its own schedule.
+So a copy of its settings in a child here goes out of date, and nothing notices. The comments of
+three POMs in this organisation did exactly that. They said the parent switched the javadoc check
+off, after a release of the parent had switched it on.
 
-Where a module really does rely on something its parent does or does not do, say so as an
-assumption and name the version it was checked against. Then the next reader can check it again in
-one command, `mvn help:effective-pom`, instead of believing a sentence.
+Sometimes a module really does rely on something its parent does or does not do. Then say so as an
+assumption, and name the version you checked it against. The next reader can check it again with one
+command, `mvn help:effective-pom`, instead of believing a sentence.
 
 ## How we write
 
@@ -125,50 +123,51 @@ included. Nothing a program reads is renamed for the sake of language: type and 
 configuration keys and artifact coordinates stay as they are, because code in other repositories
 points at them.
 
+[`AGENTS.md`](./AGENTS.md) has the same rule with examples from this repository, before and after.
+
 ## What is asked before the code is written
 
-Where a change would make an entry of [`DECISIONS.md`](./DECISIONS.md) untrue, ask before you write
-it and wait for the answer. An entry is never edited away: it stays, marked as superseded and naming
-its successor, and the new decision takes the next free number.
+If a change would make an entry of [`DECISIONS.md`](./DECISIONS.md) untrue, ask before you write it.
+Then wait for the answer. An entry is never edited away. It stays, marked as superseded and naming
+the entry which replaced it, and the new decision takes the next free number.
 
-The second question is the interface. `WorkflowAdapterCache` is published by the platform
-integration and an application may bring its own implementation, so what the cache promises is
-decided there. A property this repository owns, such as how many backups a hint gets, is decided
-here.
+The second question is the interface. The platform integration publishes `WorkflowAdapterCache`,
+and an application may bring its own implementation. So the platform decides what the cache
+promises. A property this repository owns, such as how many backups a hint gets, is decided here.
 
 ## Opening a pull request
 
-Work on a branch of your own and keep one subject per pull request. The description says what moved
-and why it had to. It may cite an issue or a conversation, because it is a record of a moment itself,
-which the code is not.
+Work on a branch of your own, and keep to one subject per pull request. The description says what
+changed and why. It may cite an issue or a conversation. A description records one moment, and the
+code does not.
 
-Check the numbers your branch hands out before you open it. Another branch may have taken the
-decision number you used while you were writing, and once a pull request is merged a
+Check the numbers your branch hands out before you open the pull request. While you were writing,
+another branch may have taken the decision number you used. Once a pull request is merged, a
 `see decision 2` in a Java file can no longer be corrected on GitHub:
 
 ```bash
 bin/check-decision-numbers.sh
 ```
 
-After you corrected a number, `bin/check-decision-citations.sh` says whether every citation of a
-decision still points at an entry of `DECISIONS.md`. The *Checks* workflow runs it on every pull
+After you corrected a number, `bin/check-decision-citations.sh` tells you whether every citation of
+a decision still points at an entry of `DECISIONS.md`. The *Checks* workflow runs it on every pull
 request.
 
-The *Build and publish snapshots* workflow builds and tests every pull request and publishes nothing
-from a branch. A red check is a finding about your change. Read the log and fix what it says rather
-than pushing again to see whether it goes away. Releases are a second workflow, started by hand with
-the version to release, and it refuses to run while a POM still names a SNAPSHOT.
+The *Build and publish snapshots* workflow builds and tests every pull request. It publishes nothing
+from a branch. A red check tells you something about your change. Read the log and fix what it says.
+Do not just push again to see whether it goes away. Releases have a second workflow. You start it
+by hand with the version to release, and it refuses to run while a POM still names a SNAPSHOT.
 
 A pull request from a fork builds and tests like any other, because the snapshots it needs can be
 read without a login. It cannot publish anything, because GitHub gives it no secrets of this
 repository.
 
-`main` carries a ruleset, and it requires two green checks before a merge: `publish`, which is the
-build of *Build and publish snapshots*, and `orphaned-javadoc-check`, which is the *Checks* workflow
-running the script named above. While one of them is red, GitHub does not offer the merge.
+`main` has a ruleset which requires two green checks before a merge. One is `publish`, the build of
+*Build and publish snapshots*. The other is `orphaned-javadoc-check`, the *Checks* workflow which
+runs the script named above. While one of them is red, GitHub does not offer the merge.
 
 ## License
 
-VanillaBP is published under the [Apache License, Version 2.0](./LICENSE), and by contributing you
-agree that your contribution is licensed the same way. [`NOTICE`](./NOTICE) names who holds the
+VanillaBP is published under the [Apache License, Version 2.0](./LICENSE). By contributing, you agree
+that your contribution is licensed the same way. [`NOTICE`](./NOTICE) names who holds the
 copyright.
