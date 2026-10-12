@@ -16,12 +16,12 @@ import io.vanillabp.integration.spi.WorkflowAdapterCache;
 import io.vanillabp.integration.test.utils.SuppressOutputExtension;
 
 /**
- * The acceptance test of this repository on Spring Boot: an application which boots
- * VanillaBP with a BPMS adapter and this dependency gets the shared cache, and the
- * in-memory default of the platform steps back without anybody wiring anything.
+ * The acceptance test of this repository on Spring Boot. It holds that an application which starts
+ * VanillaBP with a BPMS adapter and this dependency gets the shared cache. The in-memory default
+ * of the platform steps back, and nobody has to wire anything.
  * <p>
- * That the hints really leave this node is proven with a second member started inside
- * the test: what the application's bean writes is what that member reads.
+ * A second member, started inside the test, shows that the hints really leave this node. What the
+ * bean of the application writes, that member reads.
  */
 @SpringBootTest(
     classes = ElectionCacheTestApplication.class,
@@ -42,7 +42,7 @@ public class TheApplicationGetsTheSharedCacheTest {
   @DisplayName("The application's election cache is the Hazelcast one, shared with the next node")
   public void theApplicationSharesItsElections() {
 
-    // the bean this repository contributes, and not the platform's in-memory default
+    // the bean of this repository, not the in-memory default of the platform
     assertThat(cacheOfTheApplication.getClass().getSimpleName()).isEqualTo("ManagedElectionCache");
 
     final var theNextNode = ElectionCacheMember
@@ -68,8 +68,7 @@ public class TheApplicationGetsTheSharedCacheTest {
   }
 
   /**
-   * The second node of the same application: the same cluster, the same seeds, the
-   * other port.
+   * The second node of the same application: the same cluster, the same seeds, the other port.
    */
   private static HazelcastElectionCacheProperties propertiesOfTheNextNode() {
 

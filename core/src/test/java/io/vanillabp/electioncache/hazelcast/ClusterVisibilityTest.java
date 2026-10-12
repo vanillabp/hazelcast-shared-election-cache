@@ -12,9 +12,9 @@ import io.vanillabp.integration.test.utils.CapturedOutput;
 import io.vanillabp.integration.test.utils.SuppressOutputExtension;
 
 /**
- * Whether the log lets somebody tell "the cache is shared" from "the cache exists". A
- * member which found nobody works, answers every call and shares nothing, so the size
- * of the cluster is the one number which has to be readable without a debugger.
+ * Holds that the log tells "the cache is shared" from "the cache exists". A member which found
+ * nobody works and answers every call, but it shares nothing. So the size of the cluster is the
+ * one number which has to be readable without a debugger.
  */
 @ExtendWith(SuppressOutputExtension.class)
 public class ClusterVisibilityTest {
@@ -26,14 +26,13 @@ public class ClusterVisibilityTest {
 
     final var properties = TestCluster
         .properties("cluster-visibility-alone-test", TestCluster.seedRange());
-    // often enough for a test to see it twice
+    // often enough for the test to see the warning twice
     properties.setAloneReminderInterval(Duration.ofMillis(100));
 
     final var member = ElectionCacheMember
         .start(properties, "taxi-ride", Duration.ofHours(1), Duration.ofMinutes(5), null);
 
     try {
-      // the startup line names the cluster and its size
       assertThat(output.getAll()).contains("cluster-visibility-alone-test");
       assertThat(output.getAll()).contains("1 member(s)");
 

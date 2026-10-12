@@ -14,11 +14,10 @@ import io.vanillabp.integration.test.utils.CapturedOutput;
 import io.vanillabp.integration.test.utils.SuppressOutputExtension;
 
 /**
- * Whose Hazelcast the hints live in. A project which already runs Hazelcast has an
- * instance configured, and a second member in the same JVM would be waste plus a second
- * cluster to reason about - so the cache moves in, and it leaves that instance running
- * on the way out, because shutting somebody else's Hazelcast down would take their
- * caches with it.
+ * Holds whose Hazelcast the hints live in. A project which already runs Hazelcast has an instance
+ * configured. A second member in the same JVM would waste resources, and it would be a second
+ * cluster to think about. So the cache uses that instance. On shutdown it leaves the instance
+ * running, because shutting down somebody else's Hazelcast would take their caches with it.
  */
 @ExtendWith(SuppressOutputExtension.class)
 public class ElectionCacheMemberTest {
@@ -54,7 +53,7 @@ public class ElectionCacheMemberTest {
 
       member.close();
 
-      // the application's Hazelcast is still there, and so are the hints in it
+      // the Hazelcast of the application still runs, and the hints are still in it
       assertThat(applicationsInstance.getLifecycleService().isRunning()).isTrue();
       assertThat(applicationsInstance.getMap("vanillabp-election-cache").get("taxi-ride|ride|1"))
           .isEqualTo("camunda8");
@@ -114,8 +113,8 @@ public class ElectionCacheMemberTest {
   }
 
   /**
-   * A member which looks for nobody but itself: a port of its own, and its own address
-   * as the only seed.
+   * A member which looks for nobody but itself. It has a port of its own, and its own address is
+   * the only seed.
    */
   private static HazelcastElectionCacheProperties aloneOnItsOwnPort() {
 

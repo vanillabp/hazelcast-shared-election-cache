@@ -10,11 +10,11 @@ import io.vanillabp.electioncache.hazelcast.ElectionCacheMember;
 import io.vanillabp.integration.spi.WorkflowAdapterCache;
 
 /**
- * The cache as a Spring bean whose destruction takes the Hazelcast member with it. The
- * bean VanillaBP asks for is a {@link WorkflowAdapterCache}, and Spring destroys what
- * it holds by that type, so the member's lifetime has to hang off the cache rather than
- * off a bean of its own: a second bean would have to be created for its side effect and
- * would be a candidate for removal by whoever reads the configuration next.
+ * The cache as a Spring bean. When Spring destroys the bean, the Hazelcast member goes with it.
+ * VanillaBP asks for a bean of type {@link WorkflowAdapterCache}, and Spring destroys what it
+ * holds by that type. So the lifetime of the member hangs on the cache, not on a bean of its own.
+ * A second bean would exist only for its side effect, and the next reader of the configuration
+ * might remove it.
  */
 class ManagedElectionCache implements WorkflowAdapterCache, DisposableBean {
 
@@ -31,8 +31,8 @@ class ManagedElectionCache implements WorkflowAdapterCache, DisposableBean {
   }
 
   /**
-   * The cluster the hints are shared in - read by the tests and by whoever injects this
-   * bean to see where it landed.
+   * The cluster the hints are shared in. The tests read it, and so does anybody who injects this
+   * bean to see where it ended up.
    *
    * @return The cluster name
    */
@@ -43,10 +43,10 @@ class ManagedElectionCache implements WorkflowAdapterCache, DisposableBean {
   }
 
   /**
-   * The Hazelcast the hints live in: the member this bean started, or the instance the
-   * application provided. Read by the tests, which judge this instance rather than the
-   * JVM-wide list of instances - Spring keeps every test context until the JVM exits, so
-   * that list carries the members of whatever ran before.
+   * The Hazelcast the hints live in: the member this bean started, or the instance the application
+   * provided. The tests check this instance, not the list of all instances of the JVM. Spring keeps
+   * every test context until the JVM exits, so that list also holds the members of every test which
+   * ran before.
    *
    * @return The instance
    */

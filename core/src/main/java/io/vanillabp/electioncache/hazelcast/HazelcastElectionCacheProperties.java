@@ -5,78 +5,74 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Everything this cache needs on top of what the platform already asks for
- * (properties section
- * <code>vanillabp.workflow-adapter-cache.hazelcast</code>) - the single source of
- * truth for keys, defaults, validation and guiding warnings, used by both platform
- * integrations.
+ * Everything this cache needs on top of what the platform already asks for. The properties
+ * section is <code>vanillabp.workflow-adapter-cache.hazelcast</code>. This class is the one
+ * place for its keys, defaults, checks and guiding warnings, and both platform integrations use
+ * it.
  * <p>
  * The two lifetimes are NOT here. They are
  * <code>vanillabp.workflow-adapter-cache.time-to-live</code> and
- * <code>.ended-time-to-live</code>, the keys the in-memory default reads, so a team
- * moving from that default to this cache recognises every property it already set and
- * changes none of them.
+ * <code>.ended-time-to-live</code>, the keys which the in-memory default reads. So a team which
+ * moves from that default to this cache knows every property it already set, and changes none of
+ * them.
  * <p>
- * What is here is where the members are, what they call themselves and how loud they
- * are about being alone. The defaults are the ones which work on a developer machine
- * without a line of configuration; a container network needs a value for
- * {@link #DISCOVERY_PROPERTY}, and that is the one decision this cache cannot make for an
- * application.
+ * What is here: where the members are, what their cluster is called, and how loudly a member
+ * says that it is alone. The defaults work on a developer machine without a line of
+ * configuration. A container network needs a value for {@link #DISCOVERY_PROPERTY}. That is the
+ * one decision this cache cannot make for an application.
  */
 public class HazelcastElectionCacheProperties {
 
   /**
-   * Builds the section as an application which configured nothing has it. The platform
-   * integration hands the values it found to the setters, so every field a deployment
-   * says nothing about keeps the default written next to it.
+   * Builds the section the way an application has it which configured nothing. The platform
+   * integration passes the values it found to the setters. So every field which a deployment does
+   * not set keeps the default written next to it.
    */
   public HazelcastElectionCacheProperties() {
 
   }
 
   /**
-   * How a starting member learns the addresses of the members already running. There
-   * is no way which fits every environment, which is why this is a choice and not a
-   * default: multicast is filtered in most container networks, a list of addresses
-   * has to come from somewhere, and the Kubernetes ways only exist in Kubernetes.
+   * How a starting member learns the addresses of the members which already run. No way fits
+   * every environment, so this is a choice. Most container networks filter multicast. A list of
+   * addresses has to come from somewhere. And the Kubernetes ways only work in Kubernetes.
    */
   public enum Discovery {
 
     /**
-     * Let Hazelcast decide: it tries multicast and its cloud plugins in turn. Right
-     * for a developer machine and for a flat network, and the reason an application
-     * which adds this dependency works before anybody configured anything. In a
-     * container network it usually ends in a cluster of one, which
-     * {@link ElectionCacheMessages} says out loud for as long as it lasts.
+     * Lets Hazelcast decide. It tries multicast and its cloud plugins in turn. This is right for
+     * a developer machine and for a flat network. It is also why an application which adds this
+     * dependency works before anybody configured anything. In a container network it usually ends
+     * in a cluster of one. {@link ElectionCacheMessages} then warns about it for as long as it
+     * lasts.
      */
     AUTO_DETECT,
 
     /**
-     * Members announce themselves on a multicast group and find each other without
-     * anybody naming anybody. Nothing is cheaper where it works, and it works in
-     * fewer places every year.
+     * Members announce themselves on a multicast group, and they find each other without anybody
+     * naming an address. Nothing is cheaper where it works. But it works in fewer places every
+     * year.
      */
     MULTICAST,
 
     /**
-     * A list of SEED addresses, not an inventory: a starting member contacts the
-     * addresses it was given, and the first member which answers hands over the full
-     * membership. Two of five nodes are enough, and a node nobody lists still joins
-     * as long as one address it names is reachable - see {@link #MEMBERS_PROPERTY}.
+     * A list of SEED addresses, not a list of all members. A starting member contacts the
+     * addresses it was given, and the first member which answers hands over all the others. Two
+     * of five nodes are enough. A node which nobody lists still joins, as long as one address it
+     * names can be reached. See {@link #MEMBERS_PROPERTY}.
      */
     MEMBERS,
 
     /**
-     * Kubernetes, either through the DNS name of a headless service (no address, no
-     * multicast, no permission to read the Kubernetes API) or through the Kubernetes
-     * API itself. Which of the two is decided by
-     * {@link #KUBERNETES_SERVICE_DNS_PROPERTY} against
-     * {@link #KUBERNETES_SERVICE_NAME_PROPERTY}.
+     * Kubernetes, in one of two ways. Either through the DNS name of a headless service, which
+     * needs no address, no multicast and no permission to read the Kubernetes API. Or through the
+     * Kubernetes API, with {@link #KUBERNETES_SERVICE_NAME_PROPERTY}. If
+     * {@link #KUBERNETES_SERVICE_DNS_PROPERTY} is set, the DNS name is used.
      */
     KUBERNETES;
 
     /**
-     * The value as a property reads it, hyphenated.
+     * The value as a property writes it, with hyphens.
      *
      * @return The configuration value naming this way of finding members
      */
@@ -87,9 +83,9 @@ public class HazelcastElectionCacheProperties {
     }
 
     /**
-     * Reads the value of {@link #DISCOVERY_PROPERTY}, hyphenated or not. Quarkus hands
-     * the value over as it was written, and a typo in it should end the boot with the
-     * four possibilities rather than with a converter's complaint.
+     * Reads the value of {@link #DISCOVERY_PROPERTY}, with or without hyphens. Quarkus passes
+     * the value on as it was written. A typo in it should stop the start with a list of the four
+     * allowed values, not with the complaint of a converter.
      *
      * @param value The configured value
      * @return The way of finding members
@@ -120,15 +116,15 @@ public class HazelcastElectionCacheProperties {
   }
 
   /**
-   * The section this cache's own properties live in. Every key below is built from it,
-   * so the prefix is written once, and every guiding message spells a key out of these
-   * constants rather than out of a literal which the binding could drift away from.
+   * The section which holds the properties of this cache. Every key below is built from it, so
+   * the prefix is written once. Every guiding message spells a key from these constants. A
+   * literal in a message could drift away from the binding.
    */
   public static final String SECTION = "vanillabp.workflow-adapter-cache.hazelcast";
 
   /**
-   * The key saying whether the cache runs on Hazelcast at all. Spring Boot reads it as
-   * the condition of the auto-configuration, which is why it exists as a constant.
+   * The key which says whether the cache runs on Hazelcast at all. Spring Boot reads it as the
+   * condition of the auto-configuration. That is why it is a constant.
    */
   public static final String ENABLED_PROPERTY = SECTION
       + ".enabled";
@@ -146,8 +142,8 @@ public class HazelcastElectionCacheProperties {
       + ".map-name";
 
   /**
-   * The key saying how a starting member finds the members already running. It is the
-   * one value this cache cannot guess for a container network.
+   * The key which says how a starting member finds the members which already run. It is the one
+   * value this cache cannot guess for a container network.
    */
   public static final String DISCOVERY_PROPERTY = SECTION
       + ".discovery";
@@ -165,19 +161,19 @@ public class HazelcastElectionCacheProperties {
       + ".port";
 
   /**
-   * The key saying whether a member whose port is taken tries the next ones.
+   * The key which says whether a member whose port is taken tries the next ones.
    */
   public static final String PORT_AUTO_INCREMENT_PROPERTY = SECTION
       + ".port-auto-increment";
 
   /**
-   * The key naming the multicast group, read where the discovery is multicast.
+   * The key naming the multicast group. It is read only if the discovery is multicast.
    */
   public static final String MULTICAST_GROUP_PROPERTY = SECTION
       + ".multicast-group";
 
   /**
-   * The key naming the multicast port, read where the discovery is multicast.
+   * The key naming the multicast port. It is read only if the discovery is multicast.
    */
   public static final String MULTICAST_PORT_PROPERTY = SECTION
       + ".multicast-port";
@@ -201,99 +197,95 @@ public class HazelcastElectionCacheProperties {
       + ".kubernetes-namespace";
 
   /**
-   * The key saying how many copies of each partition the cluster keeps.
+   * The key which says how many copies of each partition the cluster keeps.
    */
   public static final String BACKUP_COUNT_PROPERTY = SECTION
       + ".backup-count";
 
   /**
-   * The key saying whether a Hazelcast the application already provides is used.
+   * The key which says whether a Hazelcast which the application already provides is used.
    */
   public static final String USE_EXISTING_INSTANCE_PROPERTY = SECTION
       + ".use-existing-instance";
 
   /**
-   * The key saying how often a member which is alone in its cluster repeats that.
+   * The key which says how often a member which is alone in its cluster repeats its warning.
    */
   public static final String ALONE_REMINDER_INTERVAL_PROPERTY = SECTION
       + ".alone-reminder-interval";
 
   /**
-   * The key saying how often a failing cache reports that it answers as if it were empty.
+   * The key which says how often a failing cache reports that it answers as if it were empty.
    */
   public static final String FAILURE_LOG_INTERVAL_PROPERTY = SECTION
       + ".failure-log-interval";
 
   /**
-   * What a derived cluster name ends with, so a Hazelcast cluster of an operator's is
-   * recognisable as this cache rather than as an unknown member of their own.
+   * The end of a cluster name made from the application name. An operator who runs a Hazelcast
+   * cluster of their own then sees that this cluster belongs to the cache, and not to some
+   * unknown member of theirs.
    */
   public static final String CLUSTER_NAME_SUFFIX = "-vanillabp-election-cache";
 
   /**
-   * The map name where nothing is configured. It is also the cluster name of last
-   * resort: an application which carries no name of its own has nothing to derive one
-   * from, and two invented names would be two things to look up in a log
-   * ({@link #clusterNameOrDerived(String)}).
+   * The map name if nothing is configured. It is also the cluster name of last resort. An
+   * application without a name of its own gives nothing to make a cluster name from. And two
+   * made-up names would be two things to look up in a log ({@link #clusterNameOrDerived(String)}).
    */
   public static final String DEFAULT_MAP_NAME = "vanillabp-election-cache";
 
   /**
-   * The way of finding members where nothing is configured. It needs no configuration
-   * of its own, which is why an application works on a developer machine the moment it
-   * adds this dependency.
+   * The way of finding members if nothing is configured. It needs no configuration of its own. So
+   * an application works on a developer machine as soon as it adds this dependency.
    */
   public static final Discovery DEFAULT_DISCOVERY = Discovery.AUTO_DETECT;
 
   /**
-   * The port where nothing is configured: the one Hazelcast itself starts on, so a
-   * member of this cache sits where an operator expects a Hazelcast member to be.
+   * The port if nothing is configured. It is the port Hazelcast itself starts on. So a member of
+   * this cache sits where an operator expects a Hazelcast member to be.
    */
   public static final int DEFAULT_PORT = 5701;
 
   /**
-   * The number of copies where nothing is configured. One, so a rolling restart keeps
-   * the hints; zero is correct as well and costs one probing walk per hint a leaving
-   * node took with it.
+   * The number of copies if nothing is configured. It is one, so a rolling restart keeps the
+   * hints. Zero is correct as well. It costs one round of asking the adapters for each hint which
+   * a leaving node took with it.
    */
   public static final int DEFAULT_BACKUP_COUNT = 1;
 
   /**
-   * The reminder interval where nothing is configured. Often enough that somebody who
-   * did not read the boot log still sees it, rarely enough that the warning does not
+   * The reminder interval if nothing is configured. It is often enough that somebody who did not
+   * read the startup log still sees the warning. And it is rare enough that the warning does not
    * become noise itself.
    */
   public static final Duration DEFAULT_ALONE_REMINDER_INTERVAL = Duration.ofMinutes(5);
 
   /**
-   * The failure interval where nothing is configured. Shorter than the reminder of a
-   * lonely member, because a cache which stopped answering is news while being alone is
-   * a state which lasts.
+   * The failure interval if nothing is configured. It is shorter than the reminder of a member
+   * which is alone. A cache which stops answering is news, but being alone is a state which lasts.
    */
   public static final Duration DEFAULT_FAILURE_LOG_INTERVAL = Duration.ofMinutes(1);
 
   /**
-   * Whether the election cache runs on Hazelcast at all. Adding the dependency is what
-   * switches it on, and this is how an environment which should not form a cluster (a
-   * single-node installation, a test) goes back to the in-memory cache of the platform
-   * without the dependency being removed.
+   * Whether the election cache runs on Hazelcast at all. Adding the dependency switches it on.
+   * Some environments should not form a cluster, like an installation with one node, or a test.
+   * With this switch they go back to the in-memory cache of the platform and keep the dependency.
    */
   private boolean enabled = true;
 
   /**
-   * The name of the Hazelcast cluster the nodes of this application form. Two
-   * applications which use the same name on one network join each other and then
-   * answer each other's questions with hints about workflows the other one never
-   * heard of - one probing walk each and no worse than that, but nonsense nobody
-   * wants to debug. Unset, the name is derived from the application's own name (see
-   * {@link #clusterNameOrDerived(String)}), which is what keeps two applications
-   * apart without anybody configuring anything.
+   * The name of the Hazelcast cluster which the nodes of this application form. Two applications
+   * which use the same name on one network join each other. Then they answer each other with
+   * hints about workflows the other one never heard of. That costs one round of asking the
+   * adapters each and nothing worse, but nobody wants to debug such nonsense. If the name is not
+   * set, it is made from the name of the application (see {@link #clusterNameOrDerived(String)}).
+   * That keeps two applications apart without any configuration.
    */
   private String clusterName;
 
   /**
-   * The name of the Hazelcast map holding the hints. Worth setting where an
-   * application's own Hazelcast instance is used and its maps are configured by name.
+   * The name of the Hazelcast map which holds the hints. Set it if the cache uses the Hazelcast
+   * instance of the application, and that instance configures its maps by name.
    */
   private String mapName = DEFAULT_MAP_NAME;
 
@@ -303,94 +295,90 @@ public class HazelcastElectionCacheProperties {
   private Discovery discovery = DEFAULT_DISCOVERY;
 
   /**
-   * The addresses a starting member tries, as <code>host</code> or
-   * <code>host:port</code>, read where {@link #DISCOVERY_PROPERTY} is
-   * {@link Discovery#MEMBERS}.
+   * The addresses a starting member tries, as <code>host</code> or <code>host:port</code>. They
+   * are read only if {@link #DISCOVERY_PROPERTY} is {@link Discovery#MEMBERS}.
    * <p>
-   * <strong>Not every node has to be listed.</strong> The member which answers hands
-   * over the full membership, so a couple of stable addresses are enough and a node
-   * which nobody lists joins like any other. That is what makes the list survive a
-   * scale-up: nothing has to be regenerated when the fourth node appears.
+   * <strong>Not every node has to be listed.</strong> The member which answers hands over all the
+   * other members. So a few stable addresses are enough, and a node which nobody lists joins like
+   * any other. That is why the list still works when the application scales up. Nothing has to
+   * be rebuilt when a fourth node appears.
    */
   private List<String> members = new ArrayList<>();
 
   /**
-   * The port this member listens on for the other members. It is not the
-   * application's HTTP port and it has to be open between the nodes - a firewall or a
-   * service which forwards only the HTTP port is the likeliest reason a cluster does
-   * not form.
+   * The port this member listens on for the other members. It is not the HTTP port of the
+   * application, and it has to be open between the nodes. The most likely reason why a cluster
+   * does not form is a firewall, or a service which forwards only the HTTP port.
    */
   private int port = DEFAULT_PORT;
 
   /**
-   * Whether a member whose port is taken tries the next ones. Right on a developer
-   * machine running two nodes, and worth switching off in a container, where a fixed
-   * port is what the other members were told about.
+   * Whether a member whose port is taken tries the next ones. That is right on a developer
+   * machine which runs two nodes. Switch it off in a container. There the other members were told
+   * about a fixed port.
    */
   private boolean portAutoIncrement = true;
 
   /**
-   * The multicast group, unset meaning Hazelcast's own default. Only read where
+   * The multicast group. If it is not set, Hazelcast uses its own default. It is read only if
    * {@link #DISCOVERY_PROPERTY} is {@link Discovery#MULTICAST}.
    */
   private String multicastGroup;
 
   /**
-   * The multicast port, unset meaning Hazelcast's own default. Only read where
+   * The multicast port. If it is not set, Hazelcast uses its own default. It is read only if
    * {@link #DISCOVERY_PROPERTY} is {@link Discovery#MULTICAST}.
    */
   private Integer multicastPort;
 
   /**
-   * The DNS name of a HEADLESS Kubernetes service in front of the application's pods,
-   * e.g. <code>my-app.my-namespace.svc.cluster.local</code>. This is the way which
-   * needs neither multicast nor any address: the service resolves to the addresses of
-   * its ready pods, they come and go with the pods, and reading them needs no
-   * permission on the Kubernetes API.
+   * The DNS name of a HEADLESS Kubernetes service in front of the pods of the application, e.g.
+   * <code>my-app.my-namespace.svc.cluster.local</code>. This way needs neither multicast nor any
+   * address. The service resolves to the addresses of its ready pods, and they come and go with
+   * the pods. Reading them needs no permission on the Kubernetes API.
    */
   private String kubernetesServiceDns;
 
   /**
-   * The name of a Kubernetes service whose endpoints are read through the Kubernetes
-   * API. The alternative to {@link #KUBERNETES_SERVICE_DNS_PROPERTY} for a team which
-   * prefers naming the service over naming a DNS record; it needs a role which allows
-   * the pod to read endpoints.
+   * The name of a Kubernetes service whose endpoints are read through the Kubernetes API. It is
+   * the other choice to {@link #KUBERNETES_SERVICE_DNS_PROPERTY}, for a team which would rather
+   * name the service than a DNS record. It needs a role which allows the pod to read endpoints.
    */
   private String kubernetesServiceName;
 
   /**
-   * The Kubernetes namespace of {@link #KUBERNETES_SERVICE_NAME_PROPERTY}, unset
-   * meaning the namespace the pod itself runs in.
+   * The Kubernetes namespace of {@link #KUBERNETES_SERVICE_NAME_PROPERTY}. If it is not set, the
+   * namespace of the pod itself is used.
    */
   private String kubernetesNamespace;
 
   /**
-   * How many copies of each partition the cluster keeps. A cost decision here and not
-   * a correctness one: an entry is a hint, so a partition which goes down with its
-   * node costs the probing walk which repairs it. Zero is a legitimate setting for a
-   * cache of hints, one is the default because a rolling restart then keeps them.
+   * How many copies of each partition the cluster keeps. Here this decides about cost, not about
+   * correctness. An entry is only a hint. So a partition which goes down with its node costs one
+   * round of asking the adapters, and that round writes the hint again. Zero is a valid setting
+   * for a cache of hints. One is the default, because then a rolling restart keeps the hints.
    */
   private int backupCount = DEFAULT_BACKUP_COUNT;
 
   /**
-   * Whether an instance the application itself provides is used instead of starting
-   * one. A project which already runs Hazelcast has an instance configured, and a
-   * second member in the same JVM is waste plus a second cluster to reason about.
-   * Switch it off to keep the election cache in a cluster of its own even there.
+   * Whether an instance which the application provides is used, instead of starting one. A
+   * project which already runs Hazelcast has an instance configured. A second member in the same
+   * JVM wastes resources, and it is a second cluster to think about. Switch this off to keep the
+   * election cache in a cluster of its own anyway.
    */
   private boolean useExistingInstance = true;
 
   /**
-   * How often a member which is alone in its cluster says so. It is the one warning
-   * this cache repeats, because a cluster of one looks exactly like a working
-   * application and is the failure a shared cache was added to fix.
+   * How often a member which is alone in its cluster says so. It is the only warning this cache
+   * repeats. A cluster of one looks exactly like a working application, and it is the very
+   * failure which the shared cache was added to fix.
    */
   private Duration aloneReminderInterval = DEFAULT_ALONE_REMINDER_INTERVAL;
 
   /**
-   * How often a failing cache reports that it is answering as if it were empty. One
-   * line per failed call would drown the incident which caused it, so the first
-   * failure of an interval is logged and the rest are counted.
+   * How often a failing cache reports that it answers as if it were empty. One line per failed
+   * call would hide the cause of the failures. So the first failure of an interval is logged, and
+   * the rest are counted.
    */
   private Duration failureLogInterval = DEFAULT_FAILURE_LOG_INTERVAL;
 
@@ -556,7 +544,7 @@ public class HazelcastElectionCacheProperties {
   }
 
   /**
-   * The multicast group, read where the discovery is multicast.
+   * The multicast group. It is read only if the discovery is multicast.
    *
    * @return The multicast group, <code>null</code> for Hazelcast's own default
    */
@@ -567,7 +555,7 @@ public class HazelcastElectionCacheProperties {
   }
 
   /**
-   * The multicast group, read where the discovery is multicast.
+   * The multicast group. It is read only if the discovery is multicast.
    *
    * @param multicastGroup The multicast group, <code>null</code> for Hazelcast's own default
    */
@@ -579,7 +567,7 @@ public class HazelcastElectionCacheProperties {
   }
 
   /**
-   * The multicast port, read where the discovery is multicast.
+   * The multicast port. It is read only if the discovery is multicast.
    *
    * @return The multicast port, <code>null</code> for Hazelcast's own default
    */
@@ -590,7 +578,7 @@ public class HazelcastElectionCacheProperties {
   }
 
   /**
-   * The multicast port, read where the discovery is multicast.
+   * The multicast port. It is read only if the discovery is multicast.
    *
    * @param multicastPort The multicast port, <code>null</code> for Hazelcast's own default
    */
@@ -763,12 +751,10 @@ public class HazelcastElectionCacheProperties {
   }
 
   /**
-   * The cluster to join: the configured name, or one derived from the name the
-   * application already carries.
+   * The cluster to join: the configured name, or a name made from the name of the application.
    *
-   * @param applicationName The application's own name (<code>spring.application.name</code>
-   *          respectively <code>quarkus.application.name</code>), may be
-   *          <code>null</code>
+   * @param applicationName The name of the application (<code>spring.application.name</code> or
+   *          <code>quarkus.application.name</code>). May be <code>null</code>
    * @return The cluster name, never <code>null</code>
    */
   public String clusterNameOrDerived(
@@ -784,8 +770,8 @@ public class HazelcastElectionCacheProperties {
   }
 
   /**
-   * Whether the Kubernetes discovery reads the addresses from DNS rather than from
-   * the Kubernetes API - the mode which needs no permissions.
+   * Whether the Kubernetes discovery reads the addresses from DNS, not from the Kubernetes API.
+   * This mode needs no permissions.
    *
    * @return Whether a service DNS name is configured
    */
@@ -796,12 +782,12 @@ public class HazelcastElectionCacheProperties {
   }
 
   /**
-   * Validates what a member cannot start without, at startup and not on first use. An
-   * unconfigured application boots with the defaults; a configuration which names a
-   * way of finding members without saying where they are does not, because that
-   * cannot be an accident which is better tolerated.
+   * Checks what a member cannot start without, at startup and not on first use. An application
+   * which configured nothing starts with the defaults. A configuration which names a way of
+   * finding members, but not where they are, stops the start. That cannot be an accident which is
+   * better ignored.
    *
-   * @throws IllegalStateException Naming the offending property and the way out
+   * @throws IllegalStateException Naming the wrong property and how to fix it
    */
   public void validate() {
 
@@ -896,13 +882,12 @@ public class HazelcastElectionCacheProperties {
   }
 
   /**
-   * What is worth saying at startup without ending it: a configuration which will
-   * work and probably does not mean what it says. Reported by both platform
-   * integrations, which is why the sentences live here rather than twice.
+   * What is worth a warning at startup without stopping it: a configuration which works, but
+   * probably does not mean what it says. Both platform integrations log these. So the sentences
+   * are kept here, not twice.
    *
-   * @param applicationName The application's own name, may be <code>null</code>
-   * @return The warnings, in the order they are worth reading, empty where there is
-   *         nothing to warn about
+   * @param applicationName The name of the application, may be <code>null</code>
+   * @return The warnings, most important first. Empty if there is nothing to warn about
    */
   public List<String> warnings(
       final String applicationName) {

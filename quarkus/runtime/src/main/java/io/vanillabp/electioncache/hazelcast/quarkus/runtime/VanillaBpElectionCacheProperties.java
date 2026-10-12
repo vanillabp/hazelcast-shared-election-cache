@@ -14,25 +14,22 @@ import io.smallrye.config.WithDefault;
 import io.vanillabp.electioncache.hazelcast.HazelcastElectionCacheProperties;
 
 /**
- * This cache's OVERLAY of the shared <code>vanillabp.*</code> configuration tree: the
- * keys under <code>vanillabp.workflow-adapter-cache.hazelcast</code>, inside the section
- * the platform owns, because a team raising the lifetime of a hint and a team pointing
- * the members at a Kubernetes service are configuring the same cache.
+ * The OVERLAY of this cache on the shared <code>vanillabp.*</code> configuration tree. It holds
+ * the keys under <code>vanillabp.workflow-adapter-cache.hazelcast</code>, inside the section
+ * which the platform owns. A team which raises the lifetime of a hint and a team which points the
+ * members at a Kubernetes service configure the same cache.
  * <p>
- * Quarkus knows no blanket ignore for the <code>vanillabp</code> prefix, so a key no
- * registered mapping models fails the startup. This overlay is therefore what makes
- * these keys writable at all.
+ * Quarkus cannot ignore the whole <code>vanillabp</code> prefix. A key which no registered
+ * mapping knows stops the start. So this overlay is what makes these keys usable at all.
  * <p>
- * Never {@code @Inject} this mapping: injecting it turns it into a STATIC-INIT mapping
- * and the whole tree is validated before the extensions registered their RUN_TIME
- * overlays. Read it through
- * {@code ConfigProvider.getConfig().unwrap(SmallRyeConfig.class).getConfigMapping(...)}
- * instead, which is what {@link HazelcastElectionCacheProducer} does.
+ * Never {@code @Inject} this mapping. Injecting it turns it into a STATIC-INIT mapping, and the
+ * whole tree is then checked before the extensions registered their RUN_TIME overlays. Read it
+ * through {@code ConfigProvider.getConfig().unwrap(SmallRyeConfig.class).getConfigMapping(...)}
+ * instead, as {@link HazelcastElectionCacheProducer} does.
  * <p>
- * The defaults are the ones of {@link HazelcastElectionCacheProperties} and are written
- * twice on purpose: a mapping cannot read a constant, and a default which differs
- * between the platforms would be worse than a duplicated literal. The tests of both
- * platforms compare them.
+ * The defaults are the ones of {@link HazelcastElectionCacheProperties}. They are written twice
+ * on purpose. A mapping cannot read a constant, and a default which differs between the platforms
+ * would be worse than a literal written twice. The tests of both platforms compare them.
  */
 @StaticInitSafe
 @ConfigRoot(phase = ConfigPhase.RUN_TIME)
@@ -40,8 +37,7 @@ import io.vanillabp.electioncache.hazelcast.HazelcastElectionCacheProperties;
 public interface VanillaBpElectionCacheProperties {
 
   /**
-   * The platform's election-cache section, of which only this cache's own subsection is
-   * modeled here.
+   * The election-cache section of the platform. Only the part of this cache is modelled here.
    *
    * @return The section
    */
@@ -68,8 +64,8 @@ public interface VanillaBpElectionCacheProperties {
   interface HazelcastOverlay {
 
     /**
-     * Whether the election cache runs on Hazelcast at all. Switching it off leaves the
-     * hints in the in-memory cache of the platform, which every node keeps for itself.
+     * Whether the election cache runs on Hazelcast at all. Switched off, the hints stay in the
+     * in-memory cache of the platform, and each node keeps that cache for itself.
      *
      * @return Whether the election cache runs on Hazelcast at all
      */
@@ -77,12 +73,12 @@ public interface VanillaBpElectionCacheProperties {
     boolean enabled();
 
     /**
-     * The name of the Hazelcast cluster the nodes of this application form. Derived from
-     * the application's own name where unset, which is what keeps two applications on one
+     * The name of the Hazelcast cluster which the nodes of this application form. If it is not
+     * set, it is made from the name of the application. That keeps two applications on one
      * network apart.
      *
-     * @return The name of the Hazelcast cluster, derived from the application's name
-     *         where unset
+     * @return The name of the Hazelcast cluster. If it is not set, it is made from the name of
+     *         the application
      */
     Optional<String> clusterName();
 
@@ -104,17 +100,17 @@ public interface VanillaBpElectionCacheProperties {
     String discovery();
 
     /**
-     * The addresses a starting member tries, as 'host' or 'host:port'. They are seeds and
-     * not an inventory: the member which answers hands over the full membership, so not
-     * every node has to be listed.
+     * The addresses a starting member tries, as 'host' or 'host:port'. They are seeds, not a list
+     * of all members. The member which answers hands over all the others, so not every node has
+     * to be listed.
      *
      * @return The seed addresses a starting member tries, not the full membership
      */
     Optional<List<String>> members();
 
     /**
-     * The port the members talk to each other on. Not the application's HTTP port, and it
-     * has to be open between the nodes.
+     * The port the members talk to each other on. It is not the HTTP port of the application,
+     * and it has to be open between the nodes.
      *
      * @return The port the members talk to each other on
      */
@@ -130,32 +126,31 @@ public interface VanillaBpElectionCacheProperties {
     boolean portAutoIncrement();
 
     /**
-     * The multicast group, Hazelcast's own default where unset.
+     * The multicast group. If it is not set, Hazelcast uses its own default.
      *
-     * @return The multicast group, Hazelcast's own default where unset
+     * @return The multicast group. If it is not set, Hazelcast uses its own default
      */
     Optional<String> multicastGroup();
 
     /**
-     * The multicast port, Hazelcast's own default where unset.
+     * The multicast port. If it is not set, Hazelcast uses its own default.
      *
-     * @return The multicast port, Hazelcast's own default where unset
+     * @return The multicast port. If it is not set, Hazelcast uses its own default
      */
     Optional<Integer> multicastPort();
 
     /**
-     * The DNS name of a HEADLESS Kubernetes service in front of the pods. This is the way
-     * which needs neither multicast nor any address nor a permission on the Kubernetes
-     * API.
+     * The DNS name of a HEADLESS Kubernetes service in front of the pods. This way needs no
+     * multicast, no address and no permission on the Kubernetes API.
      *
-     * @return The DNS name of a headless Kubernetes service, the way which needs no
-     *         address and no permission
+     * @return The DNS name of a headless Kubernetes service. This way needs no address and no
+     *         permission
      */
     Optional<String> kubernetesServiceDns();
 
     /**
-     * The name of a Kubernetes service whose endpoints are read through the Kubernetes
-     * API, which needs a role allowing the pod to do so.
+     * The name of a Kubernetes service whose endpoints are read through the Kubernetes API. That
+     * needs a role which allows the pod to do so.
      *
      * @return The name of a Kubernetes service whose endpoints are read through the
      *         Kubernetes API
@@ -163,15 +158,15 @@ public interface VanillaBpElectionCacheProperties {
     Optional<String> kubernetesServiceName();
 
     /**
-     * The Kubernetes namespace of that service, the pod's own where unset.
+     * The Kubernetes namespace of that service. If it is not set, the namespace of the pod is used.
      *
-     * @return The namespace of that service, the pod's own where unset
+     * @return The namespace of that service. If it is not set, the namespace of the pod is used
      */
     Optional<String> kubernetesNamespace();
 
     /**
-     * How many copies of each partition the cluster keeps. A cost decision and not a
-     * correctness one: a hint which is gone costs one probing walk.
+     * How many copies of each partition the cluster keeps. This decides about cost, not about
+     * correctness. A hint which is gone costs one round of asking the adapters.
      *
      * @return How many copies of the hints the cluster keeps
      */
@@ -197,8 +192,7 @@ public interface VanillaBpElectionCacheProperties {
     Duration aloneReminderInterval();
 
     /**
-     * How often a cache which cannot reach Hazelcast reports that it is answering as if it
-     * were empty.
+     * How often a cache which cannot reach Hazelcast reports that it answers as if it were empty.
      *
      * @return How often a failing cache reports that it answers as if it were empty
      */
@@ -208,8 +202,8 @@ public interface VanillaBpElectionCacheProperties {
   }
 
   /**
-   * The overlay as the platform-neutral model, which is what everything below the
-   * platform integrations works with.
+   * The overlay as the model which does not depend on a platform. Everything below the platform
+   * integrations works with that model.
    *
    * @return The properties
    */

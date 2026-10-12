@@ -5,23 +5,22 @@ import com.hazelcast.config.JoinConfig;
 import com.hazelcast.config.KubernetesConfig;
 
 /**
- * The Hazelcast configuration of a member started by this repository, built from
- * {@link HazelcastElectionCacheProperties} and from nothing else: no
- * <code>hazelcast.xml</code> is read, so a file an application put on the classpath for
- * its own Hazelcast cannot silently change the cluster the election cache joins.
+ * The Hazelcast configuration of a member which this repository starts. It is built from
+ * {@link HazelcastElectionCacheProperties} and nothing else. No <code>hazelcast.xml</code> is
+ * read. So a file which an application put on the classpath for its own Hazelcast cannot silently
+ * change the cluster the election cache joins.
  * <p>
- * The member is a member and not a client, because the nodes of the application ARE the
- * cluster (see decision 1 in the repository's DECISIONS.md). What it is not is a
- * general-purpose Hazelcast: Jet is off, telemetry is off, and the only map configured
- * is the one holding the hints. An application which wants more than that gives us its
- * own instance instead.
+ * It is a member and not a client, because the nodes of the application ARE the cluster (see
+ * decision 1 in the repository's DECISIONS.md). But it is not a Hazelcast for every purpose. Jet
+ * is off, telemetry is off, and the only map configured is the one which holds the hints. An
+ * application which wants more gives us its own instance instead.
  */
 final class ElectionCacheMemberConfig {
 
   /**
-   * Hazelcast reports usage data to its vendor unless this is off. An embedded member
-   * inside somebody's application is not the place to decide that for them, so it is
-   * off; an application which wants it configures its own instance and hands it over.
+   * Hazelcast sends usage data to its vendor unless this is off. A member embedded in somebody
+   * else's application should not decide that for them, so it is off. An application which wants
+   * it configures its own instance and hands it over.
    */
   private static final String PHONE_HOME_PROPERTY = "hazelcast.phone.home.enabled";
 
@@ -34,9 +33,9 @@ final class ElectionCacheMemberConfig {
    *
    * @param properties What the application configured
    * @param clusterName The cluster to join
-   * @param classLoader The class loader Hazelcast deserializes with - the one this
-   *          repository was loaded by, so the entry processor marking an ended workflow
-   *          is found on every platform
+   * @param classLoader The class loader Hazelcast deserializes with. It is the one which loaded
+   *          this repository, so the entry processor which marks an ended workflow is found on
+   *          every platform
    * @return The configuration
    */
   static Config of(
@@ -48,15 +47,15 @@ final class ElectionCacheMemberConfig {
     config.setClusterName(clusterName);
     config.setClassLoader(classLoader);
     config.setProperty(PHONE_HOME_PROPERTY, "false");
-    // the stream engine is a second product living in the same member: it starts
-    // threads and opens a port for jobs nobody submits here
+    // the stream engine (Jet) is a second product inside the same member. It starts
+    // threads and opens a port for jobs which nobody sends here
     config.getJetConfig().setEnabled(false);
 
     config
         .getMapConfig(properties.getMapName())
         .setBackupCount(properties.getBackupCount())
-        // a hint carries its own lifetime, per entry: a map-wide one could not tell a
-        // living workflow from an ended one
+        // each hint carries its own lifetime. One lifetime for the whole map could not
+        // tell a running workflow from an ended one
         .setTimeToLiveSeconds(0);
 
     final var network = config.getNetworkConfig();
@@ -70,9 +69,9 @@ final class ElectionCacheMemberConfig {
   }
 
   /**
-   * Enables exactly one way of finding members. Hazelcast refuses a configuration with
-   * two of them enabled, and its auto-detection is on until something else is, which is
-   * why every branch switches the others off rather than only its own on.
+   * Turns on exactly one way of finding members. Hazelcast refuses a configuration with two of
+   * them turned on. And its auto-detection stays on until something else is turned on. So all of
+   * them are switched off first, and then the configured one is switched on.
    */
   private static void join(
       final JoinConfig join,
@@ -104,9 +103,9 @@ final class ElectionCacheMemberConfig {
   }
 
   /**
-   * The Kubernetes discovery, in one of its two modes. The DNS mode is the one which
-   * needs neither an address nor a permission: a headless service resolves to the
-   * addresses of its ready pods, and that is all a starting member has to read.
+   * The Kubernetes discovery, in one of its two modes. The DNS mode needs neither an address nor
+   * a permission. A headless service resolves to the addresses of its ready pods, and that is all
+   * a starting member has to read.
    */
   private static KubernetesConfig kubernetes(
       final HazelcastElectionCacheProperties properties) {

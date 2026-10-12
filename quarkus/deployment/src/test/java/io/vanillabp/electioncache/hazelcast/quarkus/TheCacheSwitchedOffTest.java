@@ -16,13 +16,12 @@ import io.vanillabp.integration.test.utils.SuppressOutputExtension;
 import jakarta.inject.Inject;
 
 /**
- * An environment which should not form a cluster: a single-node installation, or a test
- * of somebody else's. The dependency stays where it is and the hints go back into the
- * in-memory cache of the platform, which every node keeps for itself.
+ * Holds what happens in an environment which should not form a cluster, like an installation with
+ * one node, or the test of another project. The dependency stays, and the hints go back into the
+ * in-memory cache of the platform. Each node keeps that cache for itself.
  * <p>
- * The bean the application gets is the platform's in-memory cache, which is also the
- * proof that no member was started: starting one is what the producer does on its way to
- * building the other bean.
+ * The application gets the in-memory cache of the platform as its bean. That also shows that no
+ * member was started. The producer starts a member only on its way to building the other bean.
  */
 @ExtendWith(SuppressOutputExtension.class)
 public class TheCacheSwitchedOffTest {
@@ -41,10 +40,10 @@ public class TheCacheSwitchedOffTest {
   @DisplayName("The hints go back into the in-memory cache, and no member is started")
   public void theInMemoryCacheTakesOver() {
 
-    // the producer of this extension is what starts a member, and it did not: the bean it
-    // produced is the platform's own cache. The JVM-wide list of Hazelcast instances is
-    // deliberately not asserted here - the applications of the other test classes of this
-    // module live in the same JVM, so that list says nothing about this one
+    // the producer of this extension starts the member, and it did not: the bean it
+    // produced is the cache of the platform. The list of all Hazelcast instances of the
+    // JVM is not checked on purpose. The applications of the other test classes of this
+    // module run in the same JVM, so that list says nothing about this one
     assertThat(cacheOfTheApplication).isInstanceOf(InMemoryWorkflowAdapterCache.class);
 
     cacheOfTheApplication.put("election-cache-test-module", "ride", "1", "pea");

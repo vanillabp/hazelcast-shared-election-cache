@@ -14,14 +14,12 @@ import io.vanillabp.integration.test.utils.CapturedOutput;
 import io.vanillabp.integration.test.utils.SuppressOutputExtension;
 
 /**
- * The behaviour which makes an entry of this cache a hint rather than a dependency: with
- * Hazelcast gone, every method answers as if the cache were empty and none of them
- * throws.
+ * Holds what makes an entry of this cache a hint and not a dependency. With Hazelcast gone, every
+ * method answers as if the cache were empty, and none of them throws.
  * <p>
- * This is the test the whole repository stands on. An application whose cache throws on
- * a network partition has turned a shortcut into an outage, and nothing about that is
- * visible until the partition happens (see decision 2 in the repository's
- * DECISIONS.md).
+ * The whole repository stands on this test. If the cache throws when the network splits, a
+ * shortcut has become an outage. And nobody sees that until the network really splits (see
+ * decision 2 in the repository's DECISIONS.md).
  */
 @ExtendWith(SuppressOutputExtension.class)
 public class UnreachableHazelcastTest {
@@ -49,8 +47,8 @@ public class UnreachableHazelcastTest {
       cache.put(MODULE, PROCESS, "1", "camunda8");
       assertThat(cache.get(MODULE, PROCESS, "1")).contains("camunda8");
     } finally {
-      // not shutdown(): a member which is killed is what a partition looks like from
-      // the inside, and it is the case an orderly shutdown would hide
+      // not shutdown(): from the inside, a split network looks like a member which is
+      // killed. An orderly shutdown would hide that case
       member.instance().getLifecycleService().terminate();
     }
 

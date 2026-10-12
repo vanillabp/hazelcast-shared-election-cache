@@ -9,10 +9,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import io.vanillabp.integration.test.utils.SuppressOutputExtension;
 
 /**
- * What a native build is told. The refusal itself is not tested - this repository builds
- * no native image, so whether the build step fires is a claim about a build nobody here
- * runs - but the sentence somebody has to act on is, because it is the only thing
- * standing between a team and an image whose member fails at startup.
+ * Holds what a native build is told. The refusal itself is not tested. This repository builds no
+ * native image, so nobody here runs the build in which the step would fire. But the sentence
+ * somebody has to act on is tested. It is the only thing which keeps a team from an image whose
+ * member fails at startup.
  */
 @ExtendWith(SuppressOutputExtension.class)
 public class NativeImageRefusalTest {

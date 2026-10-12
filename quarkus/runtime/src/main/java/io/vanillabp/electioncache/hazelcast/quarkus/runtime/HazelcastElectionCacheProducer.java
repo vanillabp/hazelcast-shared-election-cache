@@ -20,25 +20,24 @@ import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Singleton;
 
 /**
- * Contributes the election cache the nodes of one application share. The dependency is
- * the whole wiring: this bean is not a {@code DefaultBean} while the platform's
- * in-memory cache is, so the platform's steps back on its own.
+ * Provides the election cache which the nodes of one application share. Adding the dependency is
+ * all the wiring there is. This bean is not a {@code DefaultBean}, but the in-memory cache of the
+ * platform is. So the cache of the platform steps back on its own.
  * <p>
- * The lifetimes of a hint are NOT this repository's. They are read from the platform's
- * own section (<code>vanillabp.workflow-adapter-cache.time-to-live</code> and
- * <code>.ended-time-to-live</code>), so moving from the in-memory default to this cache
- * changes where the hints live and nothing about how long they live.
+ * The lifetimes of a hint do NOT belong to this repository. They are read from the section of the
+ * platform (<code>vanillabp.workflow-adapter-cache.time-to-live</code> and
+ * <code>.ended-time-to-live</code>). So moving from the in-memory default to this cache changes
+ * where the hints live, but not how long they live.
  * <p>
- * The configuration is READ rather than injected, for the reason the platform's own
- * producer states: injecting a config mapping of the <code>vanillabp</code> tree makes
- * it a static-init mapping, and the tree would then be validated before the extensions
- * registered their run-time overlays.
+ * The configuration is READ, not injected, for the reason the producer of the platform gives.
+ * Injecting a config mapping of the <code>vanillabp</code> tree makes it a static-init mapping.
+ * The tree would then be checked before the extensions registered their run-time overlays.
  */
 @ApplicationScoped
 public class HazelcastElectionCacheProducer {
 
   /**
-   * Quarkus builds the bean, and it keeps the member it started so that
+   * Quarkus creates the bean. The bean keeps the member it started, so that
    * {@link #stopTheMember()} can stop it with the application.
    */
   public HazelcastElectionCacheProducer() {
@@ -48,20 +47,20 @@ public class HazelcastElectionCacheProducer {
   private static final Logger log = LoggerFactory.getLogger(HazelcastElectionCacheProducer.class);
 
   /**
-   * The member started here, kept so that it is shut down with the application. Null
-   * where the application provided no Hazelcast and none could be started - the cache
-   * is then the platform's in-memory one and there is nothing to shut down.
+   * The member started here, kept so that it shuts down with the application. It is null if the
+   * application provided no Hazelcast and none could be started. The cache is then the in-memory
+   * one of the platform, and there is nothing to shut down.
    */
   private ElectionCacheMember member;
 
   /**
-   * The cache the nodes share, or the platform's in-memory one where this node could not
-   * join a cluster. A producer cannot decline to produce, so the fallback is built here
-   * rather than left to the platform.
+   * The cache the nodes share, or the in-memory cache of the platform if this node could not join a
+   * cluster. A producer cannot refuse to produce. So the fallback is built here, and not left to
+   * the platform.
    *
-   * @param applicationsInstance The Hazelcast the application provides, if it provides
-   *          one: a second member in the same JVM would be waste and a second cluster
-   *          to reason about
+   * @param applicationsInstance The Hazelcast the application provides, if it provides one. A
+   *          second member in the same JVM would waste resources, and it would be a second
+   *          cluster to think about
    * @return The cache VanillaBP consults before it probes the adapters
    */
   @Produces
@@ -84,7 +83,7 @@ public class HazelcastElectionCacheProducer {
                 .workflowAdapterCache());
 
     if (!properties.isEnabled()) {
-      // the same cache the platform would have produced: a producer cannot decline to
+      // the same cache the platform would have produced. A producer cannot refuse to
       // produce, so switching this off means building the default here
       return new InMemoryWorkflowAdapterCache(lifetimes);
     }
@@ -119,9 +118,9 @@ public class HazelcastElectionCacheProducer {
   }
 
   /**
-   * Shuts the member down with the application, and only where it is ours: an instance
-   * the application provided keeps running, because shutting somebody else's Hazelcast
-   * down would take their caches with it.
+   * Shuts the member down with the application, but only if it is ours. An instance which the
+   * application provided keeps running. Shutting down somebody else's Hazelcast would take their
+   * caches with it.
    */
   @PreDestroy
   public void stopTheMember() {

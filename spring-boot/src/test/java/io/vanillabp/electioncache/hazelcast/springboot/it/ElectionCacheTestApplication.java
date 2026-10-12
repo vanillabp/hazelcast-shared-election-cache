@@ -10,23 +10,22 @@ import io.vanillabp.integration.spi.PhaseTwoOutbox;
 import io.vanillabp.integration.spi.TransactionRunner;
 
 /**
- * An application as small as one can be and still boot VanillaBP: a BPMS adapter on the
- * classpath, a workflow module with no BPMN files, and doubles for the three things the
- * platform wants resolvable at startup.
+ * The smallest application which still starts VanillaBP: a BPMS adapter on the classpath, a
+ * workflow module without BPMN files, and test doubles for the three beans the platform needs at
+ * startup.
  * <p>
- * It is a real {@code @SpringBootApplication} rather than a list of configuration
- * classes, because the claim under test is exactly what the list would take away: an
- * application adds the dependency and gets the shared cache, which happens through
- * auto-configuration and its ordering.
+ * It is a real {@code @SpringBootApplication}, not a list of configuration classes. The test is
+ * about what such a list would take away: an application adds the dependency and gets the shared
+ * cache. That happens through auto-configuration and its order.
  * <p>
- * Nothing here ever runs a workflow. The doubles throw when they are used, which is what
- * keeps this test honest about what it proves.
+ * Nothing here ever runs a workflow. The doubles throw when they are used. That keeps the test
+ * honest about what it shows.
  */
 @SpringBootApplication
 public class ElectionCacheTestApplication {
 
   /**
-   * @return Who owns an aggregate nobody else claims - this application persists nothing
+   * @return The owner of an aggregate which nobody else claims. This application persists nothing
    */
   @Bean
   public AggregatePersistenceAware<Object> noPersistenceAtAll() {
@@ -66,7 +65,7 @@ public class ElectionCacheTestApplication {
   }
 
   /**
-   * @return The outbox the platform wants resolvable - no workflow is ever started here
+   * @return The outbox the platform needs at startup. No workflow is ever started here
    */
   @Bean
   public PhaseTwoOutbox noOutboxAtAll() {
@@ -78,8 +77,8 @@ public class ElectionCacheTestApplication {
   }
 
   /**
-   * @return The unit of work an application brings, as a pass-through: nothing is
-   *         persisted, so there is nothing to commit
+   * @return The unit of work an application brings, here one which just runs the work. Nothing
+   *         is persisted, so there is nothing to commit
    */
   @Bean
   public TransactionRunner passThroughTransactionRunner() {

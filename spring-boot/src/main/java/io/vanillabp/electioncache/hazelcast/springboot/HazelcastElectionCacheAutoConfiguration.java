@@ -21,20 +21,20 @@ import io.vanillabp.integration.processservice.SpringBootMigrationAdapterAutoCon
 import io.vanillabp.integration.spi.WorkflowAdapterCache;
 
 /**
- * Contributes the election cache the nodes of one application share. The dependency is
- * the whole wiring: this configuration builds the bean VanillaBP looks for and the
- * platform's in-memory default steps back, because the platform declares it
- * {@link ConditionalOnMissingBean} and this configuration is applied before it.
+ * Provides the election cache which the nodes of one application share. Adding the dependency is
+ * all the wiring there is. This configuration builds the bean VanillaBP looks for, and the
+ * in-memory default of the platform steps back. The platform declares its default
+ * {@link ConditionalOnMissingBean}, and this configuration is applied before it.
  * <p>
- * An application which brings a cache of its own still wins over both, which is what
- * {@link ConditionalOnMissingBean} on the bean below is for: an application whose
- * infrastructure is neither Hazelcast nor anything this repository supports writes its
- * own implementation, and that stays a first-class case.
+ * An application which brings a cache of its own still wins over both. That is what
+ * {@link ConditionalOnMissingBean} on the bean below is for. An application may use neither
+ * Hazelcast nor anything else this repository supports. It writes its own implementation, and that
+ * case stays fully supported.
  * <p>
- * The lifetimes of a hint are NOT read here. They are the platform's
+ * The lifetimes of a hint are NOT read here. They belong to the platform
  * (<code>vanillabp.workflow-adapter-cache.time-to-live</code> and
- * <code>.ended-time-to-live</code>), so moving from the in-memory default to this cache
- * changes where the hints live and nothing about how long they live.
+ * <code>.ended-time-to-live</code>). So moving from the in-memory default to this cache changes
+ * where the hints live, but not how long they live.
  */
 @AutoConfiguration(before = SpringBootMigrationAdapterAutoConfiguration.class)
 @ConditionalOnProperty(name = HazelcastElectionCacheProperties.ENABLED_PROPERTY, matchIfMissing = true)
@@ -44,9 +44,9 @@ import io.vanillabp.integration.spi.WorkflowAdapterCache;
 public class HazelcastElectionCacheAutoConfiguration {
 
   /**
-   * Spring Boot builds this class, once, when it applies the auto-configuration. It
-   * holds no state of its own: the member and the cache it produces below are beans and
-   * live as long as the application context does.
+   * Spring Boot creates this class once, when it applies the auto-configuration. It holds no state
+   * of its own. The member and the cache it produces below are beans, and they live as long as
+   * the application context.
    */
   public HazelcastElectionCacheAutoConfiguration() {
 
@@ -55,18 +55,18 @@ public class HazelcastElectionCacheAutoConfiguration {
   private static final Logger log = LoggerFactory.getLogger(HazelcastElectionCacheAutoConfiguration.class);
 
   /**
-   * The election cache of the cluster, or the in-memory cache of this node where the
-   * Hazelcast member could not be started. A cache which is not shared is a cost and
-   * not a defect - it probes the adapters again where a hint would have answered - so
-   * an application whose cluster does not come up boots and works.
+   * The election cache of the cluster, or the in-memory cache of this node if the Hazelcast member
+   * could not be started. A cache which is not shared costs something, but it is not a defect. It
+   * asks the adapters again where a hint would have answered. So an application whose cluster does
+   * not come up still starts and works.
    *
-   * @param properties This cache's own section, validated here rather than on first use
-   * @param platformProperties The platform's section, for the two lifetimes of a hint
-   * @param environment The Spring environment, for the application's own name, which a
-   *          cluster name is derived from
-   * @param applicationsInstance The Hazelcast the application provides, if it provides
-   *          one: a second member in the same JVM would be waste and a second cluster
-   *          to reason about
+   * @param properties The section of this cache. It is checked here, not on first use
+   * @param platformProperties The section of the platform, for the two lifetimes of a hint
+   * @param environment The Spring environment, for the name of the application. A cluster name
+   *          is made from it
+   * @param applicationsInstance The Hazelcast the application provides, if it provides one. A
+   *          second member in the same JVM would waste resources, and it would be a second
+   *          cluster to think about
    * @return The cache VanillaBP consults before it probes the adapters
    */
   @Bean
@@ -98,8 +98,8 @@ public class HazelcastElectionCacheAutoConfiguration {
                   applicationsInstance.getIfAvailable()));
     } catch (final RuntimeException e) {
       log.warn(ElectionCacheMessages.startFailed(properties), e);
-      // the platform's own default, which the platform would have built itself: the
-      // numbers it knows about itself come with it and are published under its name
+      // the default of the platform, which the platform would have built itself. Its
+      // numbers come with it and are published under its name
       return new InMemoryWorkflowAdapterCache(lifetimes);
     }
 

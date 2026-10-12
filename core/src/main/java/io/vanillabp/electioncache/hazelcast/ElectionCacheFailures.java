@@ -7,15 +7,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * What a failing cache says, and how often. Every call of the cache answers as if it
- * were empty when Hazelcast does not answer (see decision 2 in the repository's
- * DECISIONS.md), and a cluster which lost its Hazelcast fails every call: one log line
- * per call would then bury the incident which caused it under the symptom.
+ * What a failing cache logs, and how often. When Hazelcast does not answer, every call of the
+ * cache answers as if the cache were empty (see decision 2 in the repository's DECISIONS.md). A
+ * cluster which lost its Hazelcast fails every call. One log line per call would then hide the
+ * cause under its symptoms.
  * <p>
- * So the first failure of an interval is logged with its exception and the ones behind
- * it are counted, and the next line says how many there were. The count is what tells
- * an operator whether this was a hiccup during a rolling restart or a cache which has
- * been gone for an hour.
+ * So the first failure of an interval is logged with its exception. The failures after it are
+ * only counted, and the next line says how many there were. The count tells an operator what
+ * happened: a short hiccup during a rolling restart, or a cache which has been gone for an hour.
  */
 public class ElectionCacheFailures {
 
@@ -26,14 +25,14 @@ public class ElectionCacheFailures {
   private final AtomicLong suppressedSinceLastLine = new AtomicLong();
 
   /**
-   * When the last line was written, as a monotonic reading - never a wall clock, which
-   * a time change would move.
+   * When the last line was written, read from a monotonic clock. A wall clock would jump when
+   * somebody changes the time.
    */
   private final AtomicLong lastLineNanos = new AtomicLong(Long.MIN_VALUE);
 
   /**
-   * Starts out with nothing suppressed and no line written yet, so the first failure of
-   * an application's life is always logged.
+   * Starts with nothing suppressed and no line written yet. So the first failure in the life of
+   * an application is always logged.
    *
    * @param interval How long a failure suppresses the lines of the failures behind it -
    *          the value of
@@ -76,8 +75,8 @@ public class ElectionCacheFailures {
   }
 
   /**
-   * How many failures have been counted without a line of their own since the last
-   * one - read by the tests, and the number the next line reports.
+   * How many failures were counted without a line of their own since the last line. The tests
+   * read it, and the next line reports it.
    *
    * @return The number of failures not logged so far
    */

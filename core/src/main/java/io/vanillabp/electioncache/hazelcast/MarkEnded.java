@@ -7,22 +7,21 @@ import com.hazelcast.map.EntryProcessor;
 import com.hazelcast.map.ExtendedMapEntry;
 
 /**
- * Marks the hint of a workflow which ENDED, and leaves a hint naming another adapter
- * alone.
+ * Marks the hint of a workflow which ENDED. A hint which names another adapter stays as it is.
  * <p>
- * The key of a hint names the aggregate and not the workflow instance, so a second
- * workflow on the same aggregate writes the same entry. An entry naming another adapter
- * can therefore only have been written by the election of that second workflow, which
- * makes the end reported here the older knowledge of the two - and the newer one stays.
+ * The key of a hint names the aggregate, not the workflow instance. So a second workflow on the
+ * same aggregate writes the same entry. An entry which names another adapter can only come from
+ * the election of that second workflow. Then the end reported here is the older news of the two,
+ * and the newer one stays.
  * <p>
- * Reading the entry and writing it back would be two calls with a race between them,
- * which is why this runs where the entry lives: Hazelcast executes an entry processor
- * on the member owning the key and holds that key while it does. The class travels to
- * that member, which is a member of this application: the nodes are the cluster (see
- * decision 1 in the repository's DECISIONS.md), so the class is on its classpath.
+ * Reading the entry and writing it back would be two calls, with a race between them. So this
+ * runs where the entry lives. Hazelcast runs an entry processor on the member which owns the key,
+ * and it locks the key meanwhile. The class travels to that member. That member is a node of this
+ * application, because the nodes are the cluster (see decision 1 in the repository's
+ * DECISIONS.md). So the class is on its classpath.
  * <p>
- * The shorter lifetime is set on the entry rather than on the map, because the map
- * holds the hints of living workflows as well.
+ * The shorter lifetime is set on the entry, not on the map, because the map holds the hints of
+ * running workflows as well.
  */
 record MarkEnded(
                  String adapterId,
@@ -34,8 +33,8 @@ record MarkEnded(
 
     final var current = entry.getValue();
 
-    // Hazelcast removes an expired entry before an entry processor sees it, so a value
-    // which is there is a hint which is still worth something
+    // Hazelcast removes an expired entry before an entry processor sees it. So a value
+    // which is there is a hint which still counts
     if ((current != null) && !current.equals(adapterId)) {
       return Boolean.FALSE;
     }

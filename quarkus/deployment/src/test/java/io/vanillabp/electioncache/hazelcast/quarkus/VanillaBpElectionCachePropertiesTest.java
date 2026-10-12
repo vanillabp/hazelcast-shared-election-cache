@@ -17,11 +17,11 @@ import io.vanillabp.electioncache.hazelcast.quarkus.runtime.VanillaBpElectionCac
 import io.vanillabp.integration.test.utils.SuppressOutputExtension;
 
 /**
- * The overlay of the shared <code>vanillabp.*</code> tree, read without booting an
- * application. Two things are worth this test: the defaults are written a second time in
- * the mapping, because a mapping cannot read a constant, and a default which differs
- * between the platforms would be a bug nobody notices for months; and the way of finding
- * members arrives here as the string it was written as.
+ * Holds the overlay of the shared <code>vanillabp.*</code> tree, read without starting an
+ * application. Two things make this test worth it. The mapping writes the defaults a second time,
+ * because a mapping cannot read a constant. A default which differs between the platforms would
+ * be a bug which nobody notices for months. And the way of finding members arrives here as the
+ * string it was written as.
  */
 @ExtendWith(SuppressOutputExtension.class)
 public class VanillaBpElectionCachePropertiesTest {
@@ -110,7 +110,7 @@ public class VanillaBpElectionCachePropertiesTest {
 
     assertThat(mapped.getDiscovery()).isEqualTo(Discovery.MEMBERS);
     assertThat(mapped.getMembers()).containsExactly("10.0.0.1", "10.0.0.2:5702");
-    // and what arrives is valid, which is what the producer relies on
+    // what arrives is valid, and the producer relies on that
     mapped.validate();
 
   }

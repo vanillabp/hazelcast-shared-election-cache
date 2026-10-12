@@ -3,16 +3,16 @@ package io.vanillabp.electioncache.hazelcast;
 import java.time.Duration;
 
 /**
- * What this cache says at startup, while it runs and when it fails. The sentences live
- * here for two reasons: both platform integrations emit the same ones, and every one of
- * them is meant to end an operator's search rather than to record an event, which is
- * easier to keep true in one place than in four.
+ * What this cache logs at startup, while it runs and when it fails. The sentences are kept here
+ * for two reasons. Both platform integrations log the same ones. And each of them is meant to end
+ * the search of an operator, not just to record an event. That is easier to keep true in one
+ * place than in several.
  * <p>
- * Each message names what happened, what it costs and what to do about it, in that
- * order. The cost is never nothing and never an outage: a cache of hints which is gone
- * costs a probing walk per operation, and saying so is what keeps somebody from
- * treating a cluster which did not form as an incident, or a shared cache which is
- * private to each node as a working one.
+ * Each message says what happened, what it costs and what to do, in that order. The cost is never
+ * nothing, and it is never an outage. A cache of hints which is gone costs one round of asking the
+ * adapters per operation. Saying so keeps somebody from treating a cluster which did not form as
+ * an incident. It also keeps them from taking a shared cache which is private to each node for a
+ * working one.
  */
 public final class ElectionCacheMessages {
 
@@ -21,16 +21,16 @@ public final class ElectionCacheMessages {
   }
 
   /**
-   * The line a working cache leaves at startup. It names the cluster, its size and the
-   * way the members found each other, because those three are what an operator
-   * otherwise attaches a debugger for.
+   * The line a working cache logs at startup. It names the cluster, its size and the way the
+   * members found each other. Without this line, an operator would need a debugger for these
+   * three.
    *
    * @param clusterName The Hazelcast cluster the member joined
    * @param localAddress The address this member listens on
    * @param memberCount How many members the cluster has, this one included
    * @param mapName The name of the map holding the hints
    * @param backupCount How many copies of a partition the cluster keeps
-   * @param timeToLive How long the hint of a living workflow is kept
+   * @param timeToLive How long the hint of a running workflow is kept
    * @param endedTimeToLive How long the hint of an ended workflow is kept
    * @param discovery What the members find each other by
    * @return The message
@@ -62,14 +62,13 @@ public final class ElectionCacheMessages {
   }
 
   /**
-   * The warning a member which found nobody repeats for as long as it is alone. This is
-   * the trap of an embedded cluster: nothing fails, the application behaves exactly as
-   * it did with the in-memory default, and the reason somebody added a shared cache is
-   * still there.
+   * The warning which a member that found nobody repeats for as long as it is alone. This is the
+   * trap of an embedded cluster. Nothing fails, and the application behaves exactly as with the
+   * in-memory default. So the reason why somebody added a shared cache is still there.
    *
    * @param clusterName The cluster this member is alone in
-   * @param properties The configuration, for the hint which fits the way it looks for
-   *          members
+   * @param properties The configuration. It picks the hint which fits the way members are
+   *          looked for
    * @return The message
    */
   public static String alone(
@@ -87,9 +86,9 @@ public final class ElectionCacheMessages {
   }
 
   /**
-   * What to look at when a cluster does not form, per way of finding members. It is the
-   * half of the warning which saves the search, so it names the property and the thing
-   * outside the application which usually blocks it.
+   * What to check when a cluster does not form, for each way of finding members. This half of the
+   * warning saves the search. So it names the property, and the thing outside the application
+   * which usually blocks it.
    *
    * @param properties The configuration
    * @return The hint
@@ -143,7 +142,7 @@ public final class ElectionCacheMessages {
   }
 
   /**
-   * How the members of this cluster look for each other, as the startup line says it.
+   * How the members of this cluster look for each other, in the words of the startup line.
    *
    * @param properties The configuration
    * @return The description
@@ -165,8 +164,8 @@ public final class ElectionCacheMessages {
   }
 
   /**
-   * A member joined. Every membership change is logged with the size after it, so
-   * "the cache is shared" can be told from "the cache exists" by reading the log.
+   * A member joined. Every member which joins or leaves is logged with the size after it. So the
+   * log tells "the cache is shared" from "the cache exists".
    *
    * @param address The address of the member which joined
    * @param clusterName The cluster
@@ -184,9 +183,9 @@ public final class ElectionCacheMessages {
   }
 
   /**
-   * A member left, with what that costs: the hints of the partitions it held are gone
-   * where they were not backed up, and a hint which is gone costs the walk which
-   * repairs it.
+   * A member left, and what that costs. The hints of the partitions it held are gone, unless they
+   * had a backup. A hint which is gone costs one round of asking the adapters, and that round
+   * writes the hint again.
    *
    * @param address The address of the member which left
    * @param clusterName The cluster
@@ -209,8 +208,8 @@ public final class ElectionCacheMessages {
    * A call did not reach Hazelcast, and the cache answered as if it were empty.
    *
    * @param operation What was attempted
-   * @param suppressed How many failures were counted without a line of their own since
-   *          the last one
+   * @param suppressed How many failures were counted without a line of their own since the
+   *          last line
    * @param interval How often this is reported
    * @return The message
    */
@@ -232,8 +231,8 @@ public final class ElectionCacheMessages {
   }
 
   /**
-   * The member could not be started at all, which leaves the application with the
-   * in-memory cache of the platform: correct, and per node.
+   * The member could not be started at all. The application then has the in-memory cache of the
+   * platform. That cache is correct, but each node has its own.
    *
    * @param properties The configuration, for the hint which fits it
    * @return The message
@@ -251,8 +250,8 @@ public final class ElectionCacheMessages {
   }
 
   /**
-   * The application brought its own Hazelcast, and the cache moved in rather than
-   * starting a second member in the same JVM.
+   * The application brought its own Hazelcast. The cache uses it and starts no second member in
+   * the same JVM.
    *
    * @param mapName The name of the map holding the hints
    * @param clusterName The cluster the application's instance is a member of
