@@ -8,8 +8,10 @@ import java.time.Duration;
  * the search of an operator, not just to record an event. That is easier to keep true in one
  * place than in several.
  * <p>
- * Each message says what happened, what it costs and what to do, in that order. The cost is never
- * nothing, and it is never an outage. A cache of hints which is gone costs one round of asking the
+ * A warning says what happened and what it costs, and what to do where an operator can do
+ * something. A line which only reports a state, like the startup line or a member which joined,
+ * names what an operator would otherwise need a debugger for. The cost is never nothing, and it
+ * is never an outage. A cache of hints which is gone costs one round of asking the
  * adapters per operation. Saying so keeps somebody from treating a cluster which did not form as
  * an incident. It also keeps them from taking a shared cache which is private to each node for a
  * working one.

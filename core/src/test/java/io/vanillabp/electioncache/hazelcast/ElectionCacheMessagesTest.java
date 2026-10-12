@@ -13,9 +13,9 @@ import io.vanillabp.electioncache.hazelcast.HazelcastElectionCacheProperties.Dis
 import io.vanillabp.integration.test.utils.SuppressOutputExtension;
 
 /**
- * The sentences an operator reads. Each of them promises three things - what happened,
- * what it costs and what to do - and this test holds all three, because a message which
- * only reports an event sends whoever reads it into the code.
+ * The sentences an operator reads. A warning promises what happened and what it costs, and
+ * what to do where there is something to do. A line which reports a state promises the facts
+ * an operator would otherwise look up in the code. This test holds what each message promises.
  */
 @ExtendWith(SuppressOutputExtension.class)
 public class ElectionCacheMessagesTest {

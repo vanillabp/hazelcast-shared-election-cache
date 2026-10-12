@@ -99,6 +99,8 @@ public class HazelcastElectionCachePropertiesTest {
     assertThat(properties.warnings("taxi-ride"))
         .hasSize(1)
         .first(org.assertj.core.api.InstanceOfAssertFactories.STRING)
+        .contains(HazelcastElectionCacheProperties.KUBERNETES_SERVICE_DNS_PROPERTY)
+        .contains(HazelcastElectionCacheProperties.KUBERNETES_SERVICE_NAME_PROPERTY)
         .contains("DNS record wins");
 
   }

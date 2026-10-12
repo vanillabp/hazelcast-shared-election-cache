@@ -29,7 +29,8 @@ import io.vanillabp.electioncache.hazelcast.HazelcastElectionCacheProperties;
  * <p>
  * The defaults are the ones of {@link HazelcastElectionCacheProperties}. They are written twice
  * on purpose. A mapping cannot read a constant, and a default which differs between the platforms
- * would be worse than a literal written twice. The tests of both platforms compare them.
+ * would be worse than a literal written twice. A test of this Quarkus module compares them with
+ * the core model. Spring Boot binds a subclass of the core model, so its defaults cannot differ.
  */
 @StaticInitSafe
 @ConfigRoot(phase = ConfigPhase.RUN_TIME)
