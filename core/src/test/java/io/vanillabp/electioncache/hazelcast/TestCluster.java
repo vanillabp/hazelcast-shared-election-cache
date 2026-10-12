@@ -4,8 +4,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
-import com.hazelcast.core.HazelcastInstance;
-
 import io.vanillabp.electioncache.hazelcast.HazelcastElectionCacheProperties.Discovery;
 import io.vanillabp.integration.spi.WorkflowAdapterCache;
 import io.vanillabp.integration.test.utils.OneFreePortPerJvm;
@@ -135,17 +133,6 @@ final class TestCluster implements AutoCloseable {
   WorkflowAdapterCache nodeB() {
 
     return second.cache();
-
-  }
-
-  /**
-   * The Hazelcast of the second node, for a test which takes a member away.
-   *
-   * @return The instance
-   */
-  HazelcastInstance instanceOfNodeB() {
-
-    return second.instance();
 
   }
 
