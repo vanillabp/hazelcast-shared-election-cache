@@ -26,7 +26,7 @@ import io.vanillabp.integration.test.utils.SuppressOutputExtension;
 @SpringBootTest(
     classes = ElectionCacheTestApplication.class,
     properties = {
-        "spring.application.name=taxi-ride", "vanillabp.prioritized-adapters=pea", "vanillabp.adapters.pea.type=process-engine-api", "vanillabp.adapters.pea.name-clash-avoidance=none", "vanillabp.workflow-modules.election-cache-test-module.adapters.pea.resources-location=classpath*:election-cache-test-module/processes/none", "vanillabp.workflow-adapter-cache.hazelcast.cluster-name=spring-application-test", "vanillabp.workflow-adapter-cache.hazelcast.discovery=members", "vanillabp.workflow-adapter-cache.hazelcast.members=127.0.0.1:15801,127.0.0.1:15802", "vanillabp.workflow-adapter-cache.hazelcast.port=15801", "vanillabp.workflow-adapter-cache.hazelcast.alone-reminder-interval=PT1H"
+        "spring.application.name=taxi-ride", "spring.datasource.url=jdbc:h2:mem:election-cache-test;DB_CLOSE_DELAY=-1", "vanillabp.prioritized-adapters=c7", "vanillabp.adapters.c7.type=camunda7", "vanillabp.adapters.c7.name-clash-avoidance=none", "vanillabp.workflow-modules.election-cache-test-module.adapters.c7.resources-location=classpath*:election-cache-test-module/processes/none", "vanillabp.workflow-adapter-cache.hazelcast.cluster-name=spring-application-test", "vanillabp.workflow-adapter-cache.hazelcast.discovery=members", "vanillabp.workflow-adapter-cache.hazelcast.members=127.0.0.1:15801,127.0.0.1:15802", "vanillabp.workflow-adapter-cache.hazelcast.port=15801", "vanillabp.workflow-adapter-cache.hazelcast.alone-reminder-interval=PT1H"
     })
 @ExtendWith(SuppressOutputExtension.class)
 public class TheApplicationGetsTheSharedCacheTest {
@@ -54,13 +54,13 @@ public class TheApplicationGetsTheSharedCacheTest {
             null);
 
     try {
-      cacheOfTheApplication.put(MODULE, PROCESS, "1", "pea");
+      cacheOfTheApplication.put(MODULE, PROCESS, "1", "c7");
 
-      assertThat(theNextNode.cache().get(MODULE, PROCESS, "1")).contains("pea");
+      assertThat(theNextNode.cache().get(MODULE, PROCESS, "1")).contains("c7");
 
-      theNextNode.cache().put(MODULE, PROCESS, "2", "pea");
+      theNextNode.cache().put(MODULE, PROCESS, "2", "c7");
 
-      assertThat(cacheOfTheApplication.get(MODULE, PROCESS, "2")).contains("pea");
+      assertThat(cacheOfTheApplication.get(MODULE, PROCESS, "2")).contains("c7");
     } finally {
       theNextNode.close();
     }

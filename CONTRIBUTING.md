@@ -50,6 +50,23 @@ mvn install
 tests load their modules from the local Maven repository, so after `package` they would test the
 module of the run before. Spotless formats Markdown too.
 
+The tests boot with the Camunda 7 adapter. Until VanillaBP 2.0 is released, its snapshots are only in
+the GitHub Packages registry of the Camunda Community Hub, which the root `pom.xml` names
+`vanillabp-camunda7-adapter`. GitHub Packages wants a login even for a public package, so your
+`~/.m2/settings.xml` needs this entry, with a GitHub token which has `read:packages`:
+
+```xml
+<server>
+  <id>vanillabp-camunda7-adapter</id>
+  <username>your GitHub login</username>
+  <password>your token</password>
+</server>
+```
+
+The workflows read the same registry with `.github/workflows/maven-settings.xml`. A pull request from
+a fork gets no secrets, so its build cannot read the registry until the Camunda 7 adapter has a
+release on Maven Central.
+
 Two tools read the javadoc, and each one sees a part the other misses. The compiler checks every
 class for a broken reference or broken HTML, the package private ones included. The javadoc plugin
 checks what the published documentation shows, so it looks at protected and public only. One thing
@@ -72,12 +89,13 @@ element and silently drops the earlier ones. So a comment somebody wrote and kep
 nowhere. `bin/check-orphaned-javadoc.sh` finds that shape. A block it reports describes something,
 usually the element next to it. Move it back there instead of deleting it.
 
-Nothing here needs Docker or a network. Two Hazelcast members in one JVM are the cheapest cluster
+No test here needs Docker or a network. Two Hazelcast members in one JVM are the cheapest cluster
 there is, and the tests use exactly that. One node writes a hint, another one reads it, and the
 election of the platform runs across both. The tests boot a real application, and VanillaBP refuses
 to start without a BPMS adapter. So the
-[Process-Engine-API adapter](https://github.com/vanillabp/process-engine-api-adapter) is on the test
-classpath as a stand-in. Nothing about this cache depends on which BPMS an application uses.
+[Camunda 7 adapter](https://github.com/camunda-community-hub/vanillabp-camunda7-adapter) is on the
+test classpath, with its engine embedded on an H2 database in memory. Each application of a test
+gets a database of its own. Nothing about this cache depends on which BPMS an application uses.
 
 A hint is only a hint. Losing one costs a walk through the adapters and never a wrong result. So the
 test which takes the cache away matters as much as the ones which use it. Keep it that way.

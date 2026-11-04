@@ -5,8 +5,8 @@ name: Release 🚀
 #
 # It cannot run while any version in a POM is a SNAPSHOT. This repository's own version is
 # set by the workflow, so a SNAPSHOT left over is a dependency on an unreleased VanillaBP:
-# the platform, or the Process-Engine-API adapter which the tests of the platform modules
-# boot against. Maven Central refuses such a dependency, and it refuses it after the build,
+# the platform, or the Camunda 7 adapter which the tests of the platform modules boot
+# with. Maven Central refuses such a dependency, and it refuses it after the build,
 # which is why the check below ends the run before anything is signed.
 "on":
   workflow_dispatch:
@@ -83,7 +83,7 @@ jobs:
           SNAPSHOT_POMS=$(grep -R "<.*>.*SNAPSHOT<\/.*>" . --include=pom.xml || true)
 
           if [ -n "$SNAPSHOT_POMS" ]; then
-            echo "::error::A SNAPSHOT is left in a POM, so this release would depend on an unreleased VanillaBP. Release what it points at first (the platform, and the Process-Engine-API adapter the tests boot against), then raise the versions here:"
+            echo "::error::A SNAPSHOT is left in a POM, so this release would depend on an unreleased VanillaBP. Release what it points at first (the platform, and the Camunda 7 adapter the tests boot with), then raise the versions here:"
             echo "$SNAPSHOT_POMS"
             exit 1
           fi
