@@ -322,8 +322,9 @@ new version number back into main.
 It refuses to run while a POM still names a SNAPSHOT. Until VanillaBP 2.0 is released, that is every
 run. The workflow sets this repository's own version, so a SNAPSHOT which is left is a dependency on
 something unreleased, and Maven Central rejects that anyway. Two of them have to be released first:
-the platform, and the Process-Engine-API adapter which the tests of the platform modules boot
-with.
+the platform, and the Camunda 7 adapter which the tests of the platform modules boot with. When you
+raise `camunda7-adapter.version` to the release, also remove the repository
+`vanillabp-camunda7-adapter` from the root `pom.xml`. The release is on Maven Central.
 
 ## Building and testing
 
@@ -341,9 +342,14 @@ path has a test as well, because this repository depends on how it behaves when 
 
 The tests of the platform modules boot a real application, and VanillaBP refuses to start without a
 BPMS adapter on the classpath. Here the
-[Process-Engine-API adapter](https://github.com/vanillabp/process-engine-api-adapter) is that
-adapter, in test scope. It runs on an in-memory engine, needs neither Docker nor a network, and is
-only a stand-in. Nothing about this cache depends on which BPMS an application uses.
+[Camunda 7 adapter](https://github.com/camunda-community-hub/vanillabp-camunda7-adapter) is that
+adapter, in test scope. Its engine runs embedded on an H2 database in memory, so the tests need
+neither Docker nor a network. Nothing about this cache depends on which BPMS an application uses.
+
+Until VanillaBP 2.0 is released, the snapshots of the Camunda 7 adapter are only in the GitHub
+Packages registry of the Camunda Community Hub. GitHub Packages wants a login even for a public
+package. So your `~/.m2/settings.xml` needs a server entry with the id `vanillabp-camunda7-adapter`
+and a token with `read:packages`, see [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 
 What a pull request needs beyond a green build is in [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 

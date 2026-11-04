@@ -41,13 +41,23 @@
       <scope>test</scope>
     </dependency>
     <!-- a BPMS adapter is what makes an application bootable at all: VanillaBP refuses a
-         startup with no adapter on the classpath, naming it. The Process-Engine-API
-         adapter is the cheapest published one - it runs on an in-memory engine, with no
-         Docker and no network - and it is a double here, nothing about this cache depends
-         on which BPMS an application uses -->
+         startup with no adapter on the classpath, naming it. The Camunda 7 adapter runs
+         its engine embedded, on an H2 database in memory, so it needs no Docker and no
+         network. Nothing about this cache depends on which BPMS an application uses -->
     <dependency>
-      <groupId>io.vanillabp</groupId>
-      <artifactId>process-engine-api-adapter-spring-boot</artifactId>
+      <groupId>org.camunda.community.vanillabp</groupId>
+      <artifactId>camunda7-adapter-spring-boot</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- the database of the embedded engine -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-jdbc</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

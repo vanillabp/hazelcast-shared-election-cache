@@ -58,13 +58,13 @@ public class TheApplicationGetsTheSharedCacheTest {
         .start(propertiesOfTheNextNode(), "taxi-ride", Duration.ofHours(1), Duration.ofSeconds(1), null);
 
     try {
-      cacheOfTheApplication.put(MODULE, PROCESS, "1", "pea");
+      cacheOfTheApplication.put(MODULE, PROCESS, "1", "c7");
 
-      assertThat(theNextNode.cache().get(MODULE, PROCESS, "1")).contains("pea");
+      assertThat(theNextNode.cache().get(MODULE, PROCESS, "1")).contains("c7");
 
-      theNextNode.cache().put(MODULE, PROCESS, "2", "pea");
+      theNextNode.cache().put(MODULE, PROCESS, "2", "c7");
 
-      assertThat(cacheOfTheApplication.get(MODULE, PROCESS, "2")).contains("pea");
+      assertThat(cacheOfTheApplication.get(MODULE, PROCESS, "2")).contains("c7");
     } finally {
       theNextNode.close();
     }
@@ -75,8 +75,8 @@ public class TheApplicationGetsTheSharedCacheTest {
   @DisplayName("The two lifetimes are the platform's properties, not ours")
   public void theLifetimesComeFromThePlatformsSection() throws InterruptedException {
 
-    cacheOfTheApplication.put(MODULE, PROCESS, "living", "pea");
-    cacheOfTheApplication.putEnded(MODULE, PROCESS, "ended", "pea");
+    cacheOfTheApplication.put(MODULE, PROCESS, "living", "c7");
+    cacheOfTheApplication.putEnded(MODULE, PROCESS, "ended", "c7");
 
     // 'ended-time-to-live' is a second in this application, 'time-to-live' an hour
     final var deadline = System.nanoTime() + Duration.ofSeconds(30).toNanos();
@@ -85,7 +85,7 @@ public class TheApplicationGetsTheSharedCacheTest {
       Thread.sleep(50);
     }
 
-    assertThat(cacheOfTheApplication.get(MODULE, PROCESS, "living")).contains("pea");
+    assertThat(cacheOfTheApplication.get(MODULE, PROCESS, "living")).contains("c7");
 
   }
 

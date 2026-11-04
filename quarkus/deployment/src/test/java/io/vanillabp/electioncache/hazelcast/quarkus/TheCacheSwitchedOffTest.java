@@ -46,8 +46,8 @@ public class TheCacheSwitchedOffTest {
     // module run in the same JVM, so that list says nothing about this one
     assertThat(cacheOfTheApplication).isInstanceOf(InMemoryWorkflowAdapterCache.class);
 
-    cacheOfTheApplication.put("election-cache-test-module", "ride", "1", "pea");
-    assertThat(cacheOfTheApplication.get("election-cache-test-module", "ride", "1")).contains("pea");
+    cacheOfTheApplication.put("election-cache-test-module", "ride", "1", "c7");
+    assertThat(cacheOfTheApplication.get("election-cache-test-module", "ride", "1")).contains("c7");
 
   }
 
