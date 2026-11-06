@@ -50,22 +50,10 @@ mvn install
 tests load their modules from the local Maven repository, so after `package` they would test the
 module of the run before. Spotless formats Markdown too.
 
-The tests boot with the Camunda 7 adapter. Until VanillaBP 2.0 is released, its snapshots are only in
-the GitHub Packages registry of the Camunda Community Hub, which the root `pom.xml` names
-`vanillabp-camunda7-adapter`. GitHub Packages wants a login even for a public package, so your
-`~/.m2/settings.xml` needs this entry, with a GitHub token which has `read:packages`:
-
-```xml
-<server>
-  <id>vanillabp-camunda7-adapter</id>
-  <username>your GitHub login</username>
-  <password>your token</password>
-</server>
-```
-
-The workflows read the same registry with `.github/workflows/maven-settings.xml`. A pull request from
-a fork gets no secrets, so its build cannot read the registry until the Camunda 7 adapter has a
-release on Maven Central.
+The tests boot with the Camunda 7 adapter. Its snapshots are in the snapshot repository of Maven
+Central, `https://central.sonatype.com/repository/maven-snapshots/`, and so are the snapshots of the
+platform. The parent POM `io.vanillabp:release-parent` names that repository, and reading it needs
+no login. So you need no entry in `~/.m2/settings.xml`, and a pull request from a fork builds too.
 
 Two tools read the javadoc, and each one sees a part the other misses. The compiler checks every
 class for a broken reference or broken HTML, the package private ones included. The javadoc plugin
@@ -93,7 +81,7 @@ No test here needs Docker or a network. Two Hazelcast members in one JVM are the
 there is, and the tests use exactly that. One node writes a hint, another one reads it, and the
 election of the platform runs across both. The tests boot a real application, and VanillaBP refuses
 to start without a BPMS adapter. So the
-[Camunda 7 adapter](https://github.com/camunda-community-hub/vanillabp-camunda7-adapter) is on the
+[Camunda 7 adapter](https://github.com/vanillabp/camunda7-adapter) is on the
 test classpath, with its engine embedded on an H2 database in memory. Each application of a test
 gets a database of its own. Nothing about this cache depends on which BPMS an application uses.
 

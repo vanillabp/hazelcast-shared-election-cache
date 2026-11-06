@@ -66,8 +66,8 @@
     <coverage.rule>90</coverage.rule>
     <lombok.version>1.18.48</lombok.version>
     <adapter-platform.version>2.0.0-SNAPSHOT</adapter-platform.version>
-    <!-- the Camunda 7 adapter of the Camunda Community Hub, which the tests of the platform
-         modules boot with. Raise it to the release before this repository is released -->
+    <!-- the Camunda 7 adapter, which the tests of the platform modules boot with. A release
+         of this repository raises it to the released version on its release branch -->
     <camunda7-adapter.version>2.0.0-SNAPSHOT</camunda7-adapter.version>
     <!-- the version members are compiled against, and therefore the version the cluster
          of an application's nodes speaks - see the compatibility table in README.md -->
@@ -141,19 +141,19 @@
            a snapshot is resolved against the newest build of its parent, and the value is
            gone as soon as that build stops defining the property -->
       <dependency>
-        <groupId>org.camunda.community.vanillabp</groupId>
+        <groupId>io.vanillabp</groupId>
         <artifactId>camunda7-adapter-spring-boot</artifactId>
         <version>${camunda7-adapter.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
-        <groupId>org.camunda.community.vanillabp</groupId>
+        <groupId>io.vanillabp</groupId>
         <artifactId>camunda7-adapter-quarkus</artifactId>
         <version>${camunda7-adapter.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
-        <groupId>org.camunda.community.vanillabp</groupId>
+        <groupId>io.vanillabp</groupId>
         <artifactId>camunda7-adapter-quarkus-deployment</artifactId>
         <version>${camunda7-adapter.version}</version>
         <scope>test</scope>
@@ -179,24 +179,6 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
-  <!-- the snapshots of the Camunda 7 adapter are in the GitHub Packages registry of the
-       Camunda Community Hub and nowhere else. GitHub Packages wants a login even for a public
-       package, so a build needs a server entry with this id (see CONTRIBUTING.md). Remove
-       this entry together with raising camunda7-adapter.version to a release, which is on
-       Maven Central. -->
-  <repositories>
-    <repository>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>vanillabp-camunda7-adapter</id>
-      <url>https://maven.pkg.github.com/camunda-community-hub/vanillabp-camunda7-adapter</url>
-    </repository>
-  </repositories>
 
   <build>
     <pluginManagement>

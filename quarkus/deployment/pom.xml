@@ -52,12 +52,12 @@
          its engine embedded, on an H2 database in memory, so it needs no Docker and no
          network. Nothing about this cache depends on which BPMS an application uses -->
     <dependency>
-      <groupId>org.camunda.community.vanillabp</groupId>
+      <groupId>io.vanillabp</groupId>
       <artifactId>camunda7-adapter-quarkus</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.camunda.community.vanillabp</groupId>
+      <groupId>io.vanillabp</groupId>
       <artifactId>camunda7-adapter-quarkus-deployment</artifactId>
       <scope>test</scope>
     </dependency>
