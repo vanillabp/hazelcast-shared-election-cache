@@ -9,11 +9,9 @@ name: Build and publish snapshots
 # whoever pushed last decided what the other repositories compiled against.
 #
 # The snapshots go to the snapshot repository of Maven Central. Anybody can read them there
-# without a login. Writing needs the Central Portal token, and only a push to main gets it.
-# The tests boot with the Camunda 7 adapter, whose snapshots are only in the GitHub Packages
-# registry of the Camunda Community Hub, and reading that needs a login, see
-# maven-settings.xml. A pull request from a fork gets no secrets, so its build cannot read
-# that registry until the Camunda 7 adapter has a release on Maven Central.
+# without a login, the build of a pull request from a fork included. The Camunda 7 adapter,
+# which the tests boot with, comes from there too. Writing needs the Central Portal token,
+# and only a push to main gets it.
 "on":
   pull_request:
   push:
@@ -58,11 +56,8 @@ jobs:
       # the Quarkus tests load modules from the local repository.
       - name: Build and test
         if: "${{ github.event_name == 'pull_request' }}"
-        run: mvn -s .github/workflows/maven-settings.xml --batch-mode --no-transfer-progress
-          --update-snapshots install
+        run: mvn --batch-mode --no-transfer-progress --update-snapshots install
         env:
-          USER_NAME: "${{ secrets.VANILLABP_USER_NAME }}"
-          USER_TOKEN: "${{ secrets.VANILLABP_USER_TOKEN }}"
           CI: false
       # what a failing test printed is in these reports, and for the Quarkus modules
       # booting their application in the test JVM it is ONLY there: their output is
@@ -86,8 +81,6 @@ jobs:
         run: mvn -s .github/workflows/maven-settings.xml --batch-mode --no-transfer-progress
           --update-snapshots deploy -P central-portal
         env:
-          USER_NAME: "${{ secrets.VANILLABP_USER_NAME }}"
-          USER_TOKEN: "${{ secrets.VANILLABP_USER_TOKEN }}"
           MAVEN_USERNAME: "${{ secrets.MAVEN_CENTRAL_PORTAL_TOKEN_USER }}"
           MAVEN_PASSWORD: "${{ secrets.MAVEN_CENTRAL_PORTAL_TOKEN_PW }}"
           CI: false
