@@ -352,7 +352,7 @@ What a pull request needs beyond a green build is in [`CONTRIBUTING.md`](./CONTR
 
 A build also runs once a night, without anybody pushing. The workflow *Nightly against the platform
 snapshot* (`.github/workflows/nightly-platform-snapshot.yaml`) builds what a pull request builds,
-with `--update-snapshots`. It builds against whatever the platform published since yesterday. A red
+with the newest snapshots. It builds against whatever the platform published since yesterday. A red
 night opens an issue labelled `nightly-platform-snapshot`. Without it, a platform snapshot can break
 this repository and nobody sees it until the next pull request. That happened on the 26th of
 September 2026. The platform published at 12:19, the last build of the Camunda 7 adapter had run at
