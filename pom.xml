@@ -72,7 +72,7 @@
     <!-- the version members are compiled against, and therefore the version the cluster
          of an application's nodes speaks - see the compatibility table in README.md -->
     <hazelcast.version>5.7.0</hazelcast.version>
-    <spring-boot.version>4.1.3</spring-boot.version>
+    <spring-boot.version>4.2.0</spring-boot.version>
     <quarkus.version>3.40.1.2</quarkus.version>
   </properties>
 
